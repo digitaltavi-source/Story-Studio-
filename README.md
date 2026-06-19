@@ -1,9 +1,13 @@
 # AI Storytelling Studio
 
-MVP web app hỗ trợ chuyển thể script truyện đọc hoặc transcript audio thành một film adaptation package:
+Web app hỗ trợ chuyển thể script truyện đọc hoặc transcript audio thành một film adaptation package có định hướng viral, cinematic và GLOW DNA:
 
 - Story Core
-- Adaptation Strategy
+- Creative War Room
+- Agent Council
+- Viral Hook Lab
+- Million-View Script Draft
+- Retention Curve
 - Narration Surgery
 - Visual Bible
 - Master Storyboard
@@ -18,7 +22,7 @@ Mở `index.html` trực tiếp bằng trình duyệt.
 
 ## Triết lý
 
-App này không chỉ minh họa từng câu chuyện bằng hình ảnh. Nó giữ phần lõi của truyện, dịch trải nghiệm từ chữ sang tai và mắt, rồi nâng cấp thành ngôn ngữ điện ảnh.
+App này không chỉ minh họa từng câu chuyện bằng hình ảnh. Nó giữ phần lõi của truyện, dịch trải nghiệm từ chữ sang tai và mắt, rồi nâng cấp thành ngôn ngữ điện ảnh có hook, retention, share trigger và kiểm định GLOW.
 
 ## DNA GLOW
 

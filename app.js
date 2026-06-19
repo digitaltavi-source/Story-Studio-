@@ -19,151 +19,104 @@ Trong buổi biểu diễn, An bước lên sân khấu. Ban đầu cậu run r�
 Từ hôm ấy, An hiểu rằng giá trị không nằm ở thứ ta mặc bên ngoài, mà ở điều ta tạo ra bằng lòng biết ơn và can đảm.`;
 
 const genrePresets = {
+  wit: {
+    title: "WIT Daily / Healing Story",
+    promise: "Người xem thấy mình trong một khoảnh khắc đời thường và lặng đi vài giây.",
+    narration: "18-28% narration. Giọng kể là người chứng kiến, không dạy đời.",
+    style: "quiet human cinema, honest faces, lived-in details, soft natural light",
+    palette: ["#F9E6D0", "#A1C7E0", "#FFB7B2", "#FFFFFF"],
+    music: "piano rất mỏng, room tone, foley nhỏ, khoảng lặng có chủ đích"
+  },
   children: {
-    title: "Truyện thiếu nhi/cổ tích",
-    adaptation: "Hybrid Emotional Cinema, hình ảnh rõ, cảm xúc ấm, biểu tượng dễ nhớ.",
-    narration: "25-35% narration, ưu tiên lời kể ngắn và dịu.",
-    style: "storybook cinema, warm natural light, expressive faces, clean composition",
-    palette: ["#f8b84e", "#6bbf8a", "#4f7cac", "#f6efe3"],
+    title: "Thiếu nhi / cổ tích",
+    promise: "Trẻ hiểu bằng hình ảnh rõ, người lớn cảm bằng tầng nghĩa mềm.",
+    narration: "25-35% narration. Lời kể ngắn, sáng, không lên lớp.",
+    style: "premium storybook cinema, warm light, expressive faces, clean composition",
+    palette: ["#F8B84E", "#6BBF8A", "#4F7CAC", "#F6EFE3"],
     music: "piano nhẹ, woodwind mềm, foley đời thường"
   },
   fable: {
-    title: "Truyện ngụ ngôn",
-    adaptation: "Tập trung setup/payoff, bài học rõ, hình ảnh mang tính biểu tượng.",
-    narration: "30-40% narration để giữ chất kể dân gian.",
+    title: "Ngụ ngôn / bài học mềm",
+    promise: "Bài học được khán giả tự nhận ra qua setup/payoff.",
+    narration: "28-38% narration. Giữ chất kể, tránh kết luận trực diện.",
     style: "timeless fable, symbolic staging, balanced theatrical framing",
-    palette: ["#c78c3b", "#315f4b", "#b8c2a1", "#f7f0df"],
-    music: "nhạc cụ mộc, nhấn ở khoảnh khắc nhận ra bài học"
+    palette: ["#C78C3B", "#315F4B", "#B8C2A1", "#F7F0DF"],
+    music: "nhạc cụ mộc, nhấn nhẹ ở khoảnh khắc nhận ra"
   },
   inspiration: {
-    title: "Truyện truyền cảm hứng",
-    adaptation: "Đẩy emotional low, montage nỗ lực, ánh sáng chuyển từ tối sang sáng.",
-    narration: "20-30% narration, nhiều visual metaphor.",
+    title: "Truyền cảm hứng",
+    promise: "Từ vết nứt nhỏ đi tới một lựa chọn khiến người xem muốn đứng dậy.",
+    narration: "20-30% narration. Đẩy montage và visual metaphor.",
     style: "premium inspirational short film, intimate close-ups, hopeful lighting",
-    palette: ["#1f4f5f", "#f2a541", "#e6e1d6", "#8fb8a8"],
-    music: "strings tối giản, build dần về cuối"
+    palette: ["#1F4F5F", "#F2A541", "#E6E1D6", "#8FB8A8"],
+    music: "strings tối giản, build chậm, không ép cao trào"
   },
   history: {
-    title: "Truyện lịch sử/giáo dục",
-    adaptation: "Ưu tiên chính xác bối cảnh, phục trang, đạo cụ và timeline.",
-    narration: "40-55% narration để bảo toàn thông tin.",
+    title: "Lịch sử / giáo dục",
+    promise: "Thông tin chính xác nhưng vẫn có con người, lựa chọn và cái giá.",
+    narration: "40-55% narration. Bảo toàn bối cảnh và sự kiện.",
     style: "historical cinematic realism, authentic costumes, textured environments",
-    palette: ["#5b4636", "#9a7b4f", "#2f5d62", "#ddd0b7"],
+    palette: ["#5B4636", "#9A7B4F", "#2F5D62", "#DDD0B7"],
     music: "ambient lịch sử, nhạc cụ vùng miền nếu có căn cứ"
   },
   horror: {
-    title: "Truyện kinh dị nhẹ",
-    adaptation: "Dùng khoảng lặng, âm thanh nhỏ, reveal chậm, không lạm dụng jumpscare.",
-    narration: "15-25% narration, để không khí tự kể.",
+    title: "Kinh dị nhẹ",
+    promise: "Sợ vì sự im lặng và điều chưa nói, không vì jumpscare rẻ.",
+    narration: "15-25% narration. Để không khí tự kể.",
     style: "soft suspense cinema, narrow framing, practical shadows, restrained reveals",
-    palette: ["#202124", "#5e6b64", "#9b7b52", "#d4d0c8"],
+    palette: ["#202124", "#5E6B64", "#9B7B52", "#D4D0C8"],
     music: "drone thấp, tiếng phòng, tiếng gió, nhịp thưa"
   },
   romance: {
-    title: "Truyện tình cảm",
-    adaptation: "Micro emotion, ánh mắt, khoảng ngừng, chi tiết tay và không gian gần.",
-    narration: "20-30% narration, ưu tiên đối thoại và phản ứng.",
+    title: "Tình cảm",
+    promise: "Micro emotion và khoảng dừng làm người xem nhớ một người.",
+    narration: "20-30% narration. Ưu tiên ánh mắt, tay, silence và dialogue ít.",
     style: "intimate romantic drama, soft daylight, subtle gestures, gentle camera",
-    palette: ["#a95c68", "#f0c7a9", "#596f62", "#f8f3ed"],
+    palette: ["#A95C68", "#F0C7A9", "#596F62", "#F8F3ED"],
     music: "guitar/piano mềm, silence ở điểm cảm xúc"
   }
 };
 
-const glowDna = {
-  principles: [
-    {
-      title: "Sự thật con người",
-      body: "Câu chuyện phải có cảm xúc, phản ứng và lựa chọn nội tâm chân thật. Không cần twist lớn nếu người xem thấy mình trong đó."
-    },
-    {
-      title: "Không dạy đời",
-      body: "Thông điệp không được áp đặt. Ý nghĩa nên được người xem tự nhận ra qua hành động, hình ảnh và khoảng lặng."
-    },
-    {
-      title: "Đơn giản, rõ ràng, dễ cảm",
-      body: "Tránh triết lý nặng và phô diễn kỹ thuật. Sự sâu sắc đến từ trải nghiệm, không từ câu chữ lớn."
-    },
-    {
-      title: "Cảm xúc không bi lụy",
-      body: "Được buồn, được đau, nhưng không khai thác khổ đau để gây thương hại hoặc giữ người xem trong tuyệt vọng."
-    },
-    {
-      title: "Im lặng là nơi chuyển hóa",
-      body: "Silence không phải khoảng trống. Đó là nơi khán giả nghe lại chính mình và để sự thật kịp chạm."
-    },
-    {
-      title: "Remove Before Add",
-      body: "Trước khi thêm hiệu ứng, nhạc, thoại hoặc camera move, phải hỏi: nó có đưa người xem gần hơn với sự thật không?"
-    },
-    {
-      title: "Không thao túng",
-      body: "Không dùng nhạc, voice, drama hoặc dựng cảnh để ép cảm xúc. Công cụ phải nâng nền, không ra lệnh."
-    },
-    {
-      title: "Cảm trước, tính sau",
-      body: "GLOW ưu tiên compassion, awareness, reflection và ethical consistency trước tối ưu máy móc."
-    },
-    {
-      title: "Hạt mầm chuyển hóa",
-      body: "Sau phim, người xem nên mềm lại, hiểu mình hơn, nhìn điều quen thuộc khác đi hoặc lặng vài giây."
-    }
-  ],
-  storyChecks: [
-    "Nhân vật có điểm yếu, mâu thuẫn hoặc lựa chọn thật.",
-    "Thông điệp không bị nói thẳng như bài học.",
-    "Kết thúc có ánh sáng nhỏ dù không bắt buộc happy ending.",
-    "Không có drama cưỡng ép chỉ để tạo xúc động.",
-    "Câu chuyện tạo khoảnh khắc dừng lại."
-  ],
-  audioChecks: [
-    "Giọng kể là người chứng kiến, không diễn thay nỗi đau.",
-    "Nhạc nâng nền, không nói thay cảm xúc.",
-    "Có khoảng lặng đúng lúc, không sợ im lặng.",
-    "Hiệu ứng âm thanh không lấn át sự thật.",
-    "Nếu nghi ngờ, làm ít hơn."
-  ],
-  operatingModel: [
-    {
-      title: "Essence Layer",
-      body: "Giữ la bàn đạo đức, linh hồn, purpose và emotional coherence của từng câu chuyện."
-    },
-    {
-      title: "Cognitive Layer",
-      body: "Hiểu ngữ cảnh, cảm xúc, theme, symbol, character arc trước khi tạo prompt hoặc storyboard."
-    },
-    {
-      title: "Operational Layer",
-      body: "Biến hiểu biết thành workflow có truy vết: input, reasoning, output, QA, reflection."
-    },
-    {
-      title: "Expansion Layer",
-      body: "Thiết kế để mở rộng qua thể loại, ngôn ngữ, nền tảng video mà không mất linh hồn."
-    },
-    {
-      title: "Five Flames",
-      body: "Truth, Empathy, Integrity, Growth, Awareness là bộ lọc trước mọi lựa chọn sáng tạo."
-    },
-    {
-      title: "Cultural Lens",
-      body: "Global không có nghĩa đồng nhất. Câu chuyện cần được thấu hiểu ở nhiều nền văn hóa."
-    }
-  ],
-  reflectionLoop: [
-    ["Observe", "Đọc script/audio với ngữ cảnh và cảm xúc."],
-    ["Understand", "Tách theme, ý định, symbol và sự thật con người."],
-    ["Reflect", "Soi qua ethics, empathy, bias và risk of manipulation."],
-    ["Create", "Sinh storyboard, prompts, sound design có mục đích."],
-    ["Evolve", "Ghi lại bài học và tinh chỉnh phiên bản tiếp theo."]
-  ]
+const platformRules = {
+  shorts: {
+    title: "Shorts / Reels / TikTok",
+    opening: "0-2 giây phải có hình ảnh nghịch lý hoặc câu hỏi nội tâm.",
+    retention: ["0s pattern interrupt", "3s context lock", "8s emotional turn", "18s reveal", "last 3s share line"],
+    scriptUnit: "45-75 giây, mỗi câu thoại/narration dưới 11 từ."
+  },
+  youtube: {
+    title: "YouTube 3-8 phút",
+    opening: "15 giây đầu đặt lời hứa cảm xúc và một câu hỏi chưa trả lời.",
+    retention: ["0:00 cold open", "0:15 premise", "1:00 first turn", "2:30 low point", "4:00 meaning shift", "end callback"],
+    scriptUnit: "3-8 phút, mỗi 30-45 giây phải có một emotional beat."
+  },
+  festival: {
+    title: "Festival short film",
+    opening: "Mở bằng visual question, ít lời, biểu tượng mạnh.",
+    retention: ["opening image", "silent setup", "pressure", "choice", "visual payoff"],
+    scriptUnit: "Ít narration, nhiều hành động, motif và khoảng lặng."
+  },
+  education: {
+    title: "Giáo dục / lớp học",
+    opening: "Mở bằng tình huống quen thuộc để người học tự liên hệ.",
+    retention: ["question", "case", "conflict", "insight", "reflection prompt"],
+    scriptUnit: "Rõ thông tin, nhưng vẫn cần nhân vật và lựa chọn."
+  }
 };
 
-const beatTemplates = [
-  ["Hook", "Một hình ảnh/âm thanh mở đầu đặt câu hỏi cảm xúc cho khán giả."],
-  ["Setup", "Giới thiệu nhân vật, thiếu thốn, ước muốn và biểu tượng trung tâm."],
-  ["Pressure", "Xung đột làm nhân vật buộc phải đối diện nỗi sợ hoặc mặc cảm."],
-  ["Silent Turn", "Một khoảnh khắc lặng khiến ý nghĩa thật sự của câu chuyện xuất hiện."],
-  ["Choice", "Nhân vật hành động khác với bản thân ở đầu phim."],
-  ["Payoff", "Biểu tượng quay lại với nghĩa mới và thông điệp được cảm bằng hình ảnh."]
+const agents = [
+  ["Story Truth Analyst", "Tìm sự thật con người", "Theme, wound, desire, false belief", "Nếu không tìm được nỗi thật, dừng sản xuất."],
+  ["Audience Psychologist", "Hiểu lý do người xem dừng lại", "Audience pain, mirror moment, share motive", "Không tối ưu view bằng thao túng cảm xúc."],
+  ["Viral Hook Architect", "Thiết kế 3 giây đầu", "Pattern interrupt, open loop, first image", "Hook phải thật với câu chuyện, không clickbait."],
+  ["Screenwriter", "Viết lại thành script phim", "Scene intention, dialogue, narration, silence", "Mỗi đoạn phải có đổi trạng thái cảm xúc."],
+  ["Narration Surgeon", "Cắt lời kể dư", "Keep, cut, image, dialogue, silence", "Không kể thứ hình ảnh đã tự kể được."],
+  ["Cinematic Director", "Dựng ngôn ngữ điện ảnh", "Blocking, lens, camera, rhythm, transition", "Camera move phải có lý do cảm xúc."],
+  ["Art Director", "Giữ thế giới và biểu tượng", "Character, prop, location, color, texture", "Không để style đẹp nhưng rỗng."],
+  ["Sound Director", "Thiết kế tai nghe cảm xúc", "Voice, room tone, foley, music, silence", "Nhạc nâng nền, không ra lệnh."],
+  ["Image Prompt Engineer", "Tạo keyframe nhất quán", "Subject, environment, lighting, lens, style", "Prompt phải có continuity anchors."],
+  ["Motion Prompt Engineer", "Tạo video prompt dùng được", "Character, secondary, camera, environment motion", "Không chỉ viết 'nhân vật chạy'."],
+  ["Continuity Supervisor", "Chống trôi nhân vật và đạo cụ", "Face, costume, time, weather, prop state", "Mỗi clip cần reference hoặc note nối cảnh."],
+  ["Festival Quality Critic", "Soát tầm quốc tế", "Originality, clarity, taste, restraint, impact", "Nếu quá lộ bài học, trả về rewrite."]
 ];
 
 function getWords(text) {
@@ -175,325 +128,291 @@ function updateWordCount() {
 }
 
 function getSentences(text) {
-  return text
-    .replace(/\n+/g, " ")
-    .split(/(?<=[.!?。！？])\s+/)
-    .map((sentence) => sentence.trim())
-    .filter(Boolean);
+  return text.replace(/\n+/g, " ").split(/(?<=[.!?。！？])\s+/).map((s) => s.trim()).filter(Boolean);
+}
+
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" })[char]);
+}
+
+function renderList(items) {
+  return `<ul>${items.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`;
 }
 
 function inferCore(text) {
   const sentences = getSentences(text);
   const lower = text.toLowerCase();
-  const symbol = lower.includes("áo")
-    ? "Chiếc áo cũ"
-    : lower.includes("sông")
-      ? "Dòng sông"
-      : lower.includes("đèn")
-        ? "Ánh đèn"
-        : "Một vật/chi tiết lặp lại trong truyện";
-
+  const symbol = lower.includes("áo") ? "chiếc áo cũ" : lower.includes("đèn") ? "ánh đèn" : lower.includes("sông") ? "dòng sông" : "một chi tiết lặp lại";
   const protagonistMatch = text.match(/(?:tên|là)\s+([A-ZÀ-Ỹ][\p{L}]*)/u);
-  const protagonist = protagonistMatch ? protagonistMatch[1] : "Nhân vật chính";
+  const protagonist = protagonistMatch ? protagonistMatch[1] : "nhân vật chính";
+  const wound = lower.includes("nghèo") || lower.includes("cũ") ? "mặc cảm vì thiếu thốn" : "một điều chưa dám đối diện";
+  const desire = lower.includes("biểu diễn") || lower.includes("sân khấu") ? "được bước ra và được nhìn nhận" : "được hiểu, được thấy, hoặc được tha thứ";
+  const truth = lower.includes("mẹ") ? "tình yêu thường nằm trong những việc rất nhỏ" : "giá trị thật xuất hiện khi con người dám chọn điều đúng";
 
   return {
     logline: sentences[0] || "Một câu chuyện cần được chuyển thể thành trải nghiệm điện ảnh.",
-    theme: "Giá trị thật được tạo ra từ lựa chọn, lòng biết ơn và sự thay đổi bên trong.",
     protagonist,
-    arc: `${protagonist} đi từ mặc cảm/thiếu tự tin sang can đảm thể hiện giá trị thật.`,
     symbol,
-    emotionalSpine: ["Tò mò", "Thiếu thốn", "Áp lực", "Lặng", "Can đảm", "Ấm áp"]
+    wound,
+    desire,
+    falseBelief: "Mình chỉ có giá trị khi bên ngoài đủ đẹp hoặc đủ hoàn hảo.",
+    truth,
+    promise: `Người xem nhận ra: ${truth}.`,
+    emotionalSpine: ["tò mò", "nhói nhẹ", "áp lực", "lặng", "can đảm", "ấm lại"]
   };
 }
 
 function classifySentence(sentence, index) {
   const lower = sentence.toLowerCase();
-  if (index === 0 || lower.includes("ngày xưa") || lower.includes("nhiều năm")) {
-    return ["GIỮ NARRATION", "Dùng làm cầu dẫn thời gian và bối cảnh."];
-  }
-  if (lower.includes("hiểu") || lower.includes("nhận ra") || lower.includes("giá trị")) {
-    return ["CHUYỂN THÀNH SILENT MOMENT", "Thay triết lý bằng ánh mắt, đạo cụ và khoảng lặng."];
-  }
-  if (lower.includes("nói") || lower.includes("hỏi") || lower.includes("thưa")) {
-    return ["CHUYỂN THÀNH ĐỐI THOẠI", "Giữ thông tin nhưng cho nhân vật tự bộc lộ."];
-  }
-  if (lower.includes("buồn") || lower.includes("run") || lower.includes("sợ") || lower.includes("mỉm cười")) {
-    return ["CHUYỂN THÀNH REACTION SHOT", "Để cảm xúc hiện qua mặt, tay, nhịp thở."];
-  }
-  return ["CHUYỂN THÀNH HÌNH ẢNH", "Dựng thành hành động, môi trường, đạo cụ và blocking."];
+  if (index === 0 || lower.includes("ngày xưa") || lower.includes("nhiều năm")) return ["GIỮ LÀM CẦU DẪN", "Dùng rất ngắn để đặt thời gian, nơi chốn, chất kể."];
+  if (lower.includes("hiểu") || lower.includes("nhận ra") || lower.includes("giá trị")) return ["CHUYỂN THÀNH SILENT PAYOFF", "Không nói bài học. Dùng ánh mắt, đạo cụ, callback."];
+  if (lower.includes("nói") || lower.includes("hỏi") || lower.includes("thầy")) return ["CHUYỂN THÀNH ĐỐI THOẠI", "Cho thông tin đi qua hành vi nhân vật."];
+  if (lower.includes("run") || lower.includes("cúi") || lower.includes("mỉm cười") || lower.includes("lặng")) return ["CHUYỂN THÀNH REACTION SHOT", "Giữ cảm xúc bằng mặt, tay, hơi thở, nhịp im."];
+  return ["CHUYỂN THÀNH HÌNH ẢNH", "Dựng bằng đạo cụ, không gian, hành động và âm thanh."];
 }
 
-function makeScenes(core, preset, minutes) {
-  const seconds = minutes * 60;
-  const sceneDuration = Math.max(18, Math.round(seconds / beatTemplates.length));
-  return beatTemplates.map(([beat, purpose], index) => ({
-    number: index + 1,
-    beat,
-    duration: `${sceneDuration}s`,
-    title: `${beat}: ${core.symbol}`,
-    purpose,
-    action:
-      index === 0
-        ? `Mở bằng chi tiết ${core.symbol.toLowerCase()} trong không gian sống của ${core.protagonist}.`
-        : index === 3
-          ? `${core.protagonist} im lặng quan sát biểu tượng trung tâm, ý nghĩa chuyển từ vật chất sang tình cảm.`
-          : `${core.protagonist} đối diện thử thách của beat "${beat}" bằng hành động cụ thể.`,
-    emotion: core.emotionalSpine[index],
-    camera: index % 2 === 0 ? "Close-up chậm, handheld rất nhẹ" : "Medium shot, dolly-in tinh tế",
-    sound: index === 3 ? "Gần như im lặng, chỉ còn foley và hơi thở" : preset.music
+function makeHooks(core, platform) {
+  return [
+    `Nếu một ${core.symbol} có thể nói, nó sẽ kể điều gì về ${core.protagonist}?`,
+    `${core.protagonist} tưởng mình thiếu một thứ để được nhìn thấy. Nhưng điều thiếu nhất lại không nằm trên người.`,
+    `Có những món đồ cũ không làm ta xấu đi. Chúng chỉ đang giữ hộ một tình yêu mà ta chưa kịp hiểu.`
+  ].map((hook, index) => ({
+    label: index === 0 ? "Visual Hook" : index === 1 ? "Psychological Hook" : "Share Hook",
+    hook,
+    why: index === 0 ? platform.opening : "Mở vòng tò mò nhưng vẫn giữ sự thật cảm xúc."
   }));
 }
 
-function renderList(items) {
-  return `<ul>${items.map((item) => `<li>${item}</li>`).join("")}</ul>`;
+function makeScriptBeats(core, platform) {
+  return [
+    ["Cold open", `Cận cảnh ${core.symbol}. Một vết cũ hiện lên trước khi ta thấy mặt ${core.protagonist}.`, "Không giải thích. Chỉ room tone và một hơi thở nhỏ.", "Open loop bằng hình ảnh."],
+    ["Mirror setup", `${core.protagonist} nhìn người khác có thứ mình thiếu. Tay vô thức chạm vào ${core.symbol}.`, "Một câu kể ngắn: Có những ngày ta thấy mình nhỏ hơn mọi người.", "Người xem tự nhận ra nỗi quen."],
+    ["Pressure", `Một sự kiện buộc ${core.protagonist} phải xuất hiện trước người khác.`, "Giảm nhạc, tăng foley tay áo, tiếng ghế, tiếng chân.", "Tạo căng thẳng không cần drama."],
+    ["Silent turn", `Nhân vật nhìn thấy ai đó âm thầm sửa chữa, giữ gìn hoặc hy sinh cho mình.`, "Khoảng lặng 2-4 giây. Không lời.", "Nơi chuyển hóa xảy ra."],
+    ["Choice", `${core.protagonist} vẫn bước ra, không vì đã hoàn hảo mà vì đã hiểu mình được yêu.`, "Nhạc chỉ nâng nền sau hành động, không kéo trước.", "Cao trào bằng lựa chọn."],
+    ["Payoff", `${core.symbol} trở lại trong khung hình cuối, nhưng nghĩa đã đổi.`, "Câu cuối mở: Có những thứ cũ chỉ chờ ta đủ lớn để hiểu.", "Dễ share, không dạy đời."]
+  ].map(([beat, visual, audio, job], index) => ({
+    beat,
+    time: platform.retention[index] || `Beat ${index + 1}`,
+    visual,
+    audio,
+    job
+  }));
 }
 
-function renderStoryCore(core) {
+function makeScenes(core, preset, platform, minutes) {
+  const scriptBeats = makeScriptBeats(core, platform);
+  const sceneDuration = Math.max(8, Math.round((minutes * 60) / scriptBeats.length));
+  return scriptBeats.map((beat, index) => ({
+    number: index + 1,
+    duration: `${sceneDuration}s`,
+    title: beat.beat,
+    purpose: beat.job,
+    action: beat.visual,
+    narration: beat.audio,
+    emotion: core.emotionalSpine[index],
+    camera: index % 2 === 0 ? "close-up có chủ đích, camera gần nhân vật" : "medium shot, dolly-in rất chậm",
+    sound: index === 3 ? "silence, room tone, foley nhỏ" : preset.music
+  }));
+}
+
+function renderWarRoom(core, preset, platform, text) {
   document.querySelector("#storyCore").classList.remove("empty");
   document.querySelector("#storyCore").innerHTML = `
-    <p><strong>Logline:</strong> ${core.logline}</p>
-    <p><strong>Theme:</strong> ${core.theme}</p>
-    <p><strong>Character Arc:</strong> ${core.arc}</p>
+    <p><strong>Logline:</strong> ${escapeHtml(core.logline)}</p>
+    <p><strong>Human truth:</strong> ${escapeHtml(core.truth)}</p>
+    <p><strong>Wound:</strong> ${escapeHtml(core.wound)}</p>
+    <p><strong>Desire:</strong> ${escapeHtml(core.desire)}</p>
+    <p><strong>False belief:</strong> ${escapeHtml(core.falseBelief)}</p>
     <div class="pill-list">
-      <span class="pill">Nhân vật: ${core.protagonist}</span>
-      <span class="pill">Symbol: ${core.symbol}</span>
-      <span class="pill">Mode: Hybrid Emotional Cinema</span>
-    </div>
-  `;
+      <span class="pill">Nhân vật: ${escapeHtml(core.protagonist)}</span>
+      <span class="pill">Symbol: ${escapeHtml(core.symbol)}</span>
+      <span class="pill">${escapeHtml(preset.title)}</span>
+      <span class="pill">${escapeHtml(platform.title)}</span>
+    </div>`;
 
-  document.querySelector("#emotionArc").innerHTML = core.emotionalSpine
-    .map((label, index) => `<div class="arc-bar" style="height:${64 + index * 18}px">${label}</div>`)
-    .join("");
-
-  document.querySelector("#symbolTracker").classList.remove("empty");
-  document.querySelector("#symbolTracker").innerHTML = renderList([
-    `Xuất hiện lần 1: ${core.symbol} như dấu hiệu thiếu thốn.`,
-    `Xuất hiện lần 2: ${core.symbol} gắn với hy sinh hoặc ký ức.`,
-    `Xuất hiện cuối: ${core.symbol} đổi nghĩa thành lòng biết ơn/can đảm.`
+  document.querySelector("#viralThesis").classList.remove("empty");
+  document.querySelector("#viralThesis").innerHTML = renderList([
+    "Viral angle: một chi tiết nhỏ bẻ khóa một cảm xúc lớn.",
+    "Audience mirror: ai từng thấy mình chưa đủ tốt sẽ dừng lại.",
+    "Share reason: gửi cho người đã từng âm thầm yêu thương mình.",
+    `Promise: ${preset.promise}`
   ]);
-}
 
-function renderGlowDna(text, core) {
-  document.querySelector("#glowPrinciples").innerHTML = glowDna.principles
-    .map(
-      (principle) => `
-        <div class="dna-card">
-          <strong>${principle.title}</strong>
-          <p>${principle.body}</p>
-        </div>
-      `
-    )
-    .join("");
-
-  document.querySelector("#glowOperatingModel").innerHTML = glowDna.operatingModel
-    .map(
-      (item) => `
-        <div class="model-card">
-          <strong>${item.title}</strong>
-          <p>${item.body}</p>
-        </div>
-      `
-    )
-    .join("");
-
-  document.querySelector("#reflectionLoop").innerHTML = glowDna.reflectionLoop
-    .map(
-      ([title, body]) => `
-        <div class="loop-step">
-          <strong>${title}</strong>
-          <span>${body}</span>
-        </div>
-      `
-    )
-    .join("");
-
-  const lower = text.toLowerCase();
-  const storySignals = [
-    lower.includes("nhận ra") || lower.includes("hiểu") || lower.includes("lặng"),
-    lower.includes("mẹ") || lower.includes("cha") || lower.includes("bạn") || lower.includes("người"),
-    lower.includes("sợ") || lower.includes("buồn") || lower.includes("run") || lower.includes("mỉm cười"),
-    !lower.includes("bài học là") && !lower.includes("chúng ta phải"),
-    lower.includes(core.symbol.toLowerCase().split(" ")[0])
-  ];
-
-  const audioSignals = [
-    true,
-    !lower.includes("cao trào dữ dội"),
-    lower.includes("lặng") || lower.includes("im lặng") || lower.includes("cúi đầu"),
-    true,
-    true
-  ];
-
-  document.querySelector("#witStoryCheck").classList.remove("empty");
-  document.querySelector("#witStoryCheck").innerHTML = glowDna.storyChecks
-    .map((check, index) => {
-      const level = storySignals[index] ? "ok" : "warn";
-      return `<div class="check-item ${level}"><strong>${storySignals[index] ? "Đạt" : "Cần gia cố"}</strong><p>${check}</p></div>`;
-    })
-    .join("");
-
-  document.querySelector("#witAudioCheck").classList.remove("empty");
-  document.querySelector("#witAudioCheck").innerHTML = glowDna.audioChecks
-    .map((check, index) => {
-      const level = audioSignals[index] ? "ok" : "warn";
-      return `<div class="check-item ${level}"><strong>${audioSignals[index] ? "Giữ" : "Xem lại"}</strong><p>${check}</p></div>`;
-    })
-    .join("");
+  document.querySelector("#retentionCurve").classList.remove("empty");
+  document.querySelector("#retentionCurve").innerHTML = platform.retention.map((label, index) => `<div class="curve-step" style="height:${64 + index * 14}px"><strong>${index + 1}</strong><span>${escapeHtml(label)}</span></div>`).join("");
 
   document.querySelector("#glowAlignment").classList.remove("empty");
   document.querySelector("#glowAlignment").innerHTML = renderList([
-    `Linh hồn cần giữ: ${core.theme}`,
-    `Biểu tượng chuyển hóa: ${core.symbol}`,
-    "Bốn tầng GLOW phải cùng hiện diện: linh hồn, nhận thức, vận hành, mở rộng.",
-    "Năm ngọn lửa Truth, Empathy, Integrity, Growth, Awareness là bộ lọc trước khi xuất.",
-    "Mọi prompt phải ưu tiên sự thật cảm xúc trước kỹ thuật đẹp.",
-    "Không thêm nhạc, thoại, hiệu ứng hoặc twist nếu chúng làm người xem bị dẫn dắt thay vì tự chạm.",
-    "Mọi output cần đi qua Observe -> Understand -> Reflect -> Create -> Evolve.",
-    "QA cuối cùng phải hỏi: phim này có gieo một hạt mầm chuyển hóa không?"
+    "Không giảng đạo. Để người xem tự chạm.",
+    "Không thao túng bằng nhạc, bi kịch hoặc twist cưỡng ép.",
+    "Nếu một kỹ thuật làm sự thật mờ đi, bỏ kỹ thuật đó.",
+    "Mỗi output phải đi qua Observe -> Understand -> Reflect -> Create -> Evolve.",
+    `Câu hỏi cuối: người xem có mềm lại hoặc hiểu mình hơn sau ${getWords(text).length} từ này không?`
+  ]);
+}
+
+function renderAgents() {
+  document.querySelector("#agentCouncil").innerHTML = agents.map(([name, mission, output, fail], index) => `
+    <article class="agent-card">
+      <div class="agent-index">${String(index + 1).padStart(2, "0")}</div>
+      <h3>${escapeHtml(name)}</h3>
+      <p><strong>Vai trò:</strong> ${escapeHtml(mission)}</p>
+      <p><strong>Output:</strong> ${escapeHtml(output)}</p>
+      <p><strong>Luật sống còn:</strong> ${escapeHtml(fail)}</p>
+      <span>${escapeHtml(index < 3 ? "Chiến lược" : index < 8 ? "Sản xuất" : "Kiểm định")}</span>
+    </article>
+  `).join("");
+}
+
+function renderScriptLab(core, platform) {
+  const hooks = makeHooks(core, platform);
+  document.querySelector("#hookLab").classList.remove("empty");
+  document.querySelector("#hookLab").innerHTML = hooks.map((item) => `
+    <div class="prompt-item">
+      <strong>${escapeHtml(item.label)}</strong>
+      <p>${escapeHtml(item.hook)}</p>
+      <p>${escapeHtml(item.why)}</p>
+    </div>`).join("");
+
+  const beats = makeScriptBeats(core, platform);
+  document.querySelector("#scriptDraft").classList.remove("empty");
+  document.querySelector("#scriptDraft").innerHTML = beats.map((beat, index) => `
+    <div class="script-row">
+      <div><strong>${index + 1}. ${escapeHtml(beat.beat)}</strong><span>${escapeHtml(beat.time)}</span></div>
+      <p><b>Visual:</b> ${escapeHtml(beat.visual)}</p>
+      <p><b>Audio:</b> ${escapeHtml(beat.audio)}</p>
+      <p><b>Retention job:</b> ${escapeHtml(beat.job)}</p>
+    </div>`).join("");
+
+  document.querySelector("#shareTriggers").classList.remove("empty");
+  document.querySelector("#shareTriggers").innerHTML = renderList([
+    "Gửi cho mẹ/cha/người từng âm thầm hy sinh.",
+    "Gửi cho người đang thấy mình chưa đủ tốt.",
+    "Gửi cho ai cần một câu chuyện không dạy đời nhưng vẫn sáng."
+  ]);
+
+  document.querySelector("#commentPrompts").classList.remove("empty");
+  document.querySelector("#commentPrompts").innerHTML = renderList([
+    "Bạn từng giữ một món đồ cũ vì nó chứa một người không?",
+    "Có điều gì đến rất muộn bạn mới hiểu về gia đình mình?",
+    "Khoảnh khắc nào từng làm bạn thấy mình được yêu?"
   ]);
 }
 
 function renderAdaptation(text, preset) {
-  const sentences = getSentences(text).slice(0, 8);
-  const plan = sentences.map((sentence, index) => {
-    const [type, note] = classifySentence(sentence, index);
-    return `<div class="prompt-item"><strong>${type}</strong><p>${sentence}</p><p>${note}</p></div>`;
-  });
+  const sentences = getSentences(text).slice(0, 10);
   document.querySelector("#narrationPlan").classList.remove("empty");
-  document.querySelector("#narrationPlan").innerHTML = plan.join("");
+  document.querySelector("#narrationPlan").innerHTML = sentences.map((sentence, index) => {
+    const [type, note] = classifySentence(sentence, index);
+    return `<div class="prompt-item"><strong>${escapeHtml(type)}</strong><p>${escapeHtml(sentence)}</p><p>${escapeHtml(note)}</p></div>`;
+  }).join("");
 
   document.querySelector("#mediumMap").classList.remove("empty");
   document.querySelector("#mediumMap").innerHTML = renderList([
-    "Chữ miêu tả nội tâm -> ánh mắt, hơi thở, khoảng dừng.",
-    "Chữ miêu tả hoàn cảnh -> bối cảnh, đạo cụ, trang phục.",
-    "Triết lý cuối truyện -> visual callback thay vì giảng giải.",
-    "Cao trào audio -> hành động có lựa chọn rõ trên màn hình."
+    "Chữ mô tả nội tâm -> ánh mắt, tay, hơi thở, khoảng ngừng.",
+    "Chữ mô tả hoàn cảnh -> bối cảnh, đạo cụ, phục trang, texture.",
+    "Triết lý -> visual callback hoặc lựa chọn của nhân vật.",
+    "Cao trào audio -> hành động không thể rút lại trên màn hình."
   ]);
 
   document.querySelector("#genrePreset").classList.remove("empty");
   document.querySelector("#genrePreset").innerHTML = `
-    <p><strong>${preset.title}</strong></p>
-    <p>${preset.adaptation}</p>
-    <p><strong>Tỷ lệ kể:</strong> ${preset.narration}</p>
-  `;
+    <p><strong>${escapeHtml(preset.title)}</strong></p>
+    <p>${escapeHtml(preset.promise)}</p>
+    <p><strong>Tỷ lệ kể:</strong> ${escapeHtml(preset.narration)}</p>
+    <p><strong>Style:</strong> ${escapeHtml(preset.style)}</p>`;
 }
 
-function renderVisualBible(core, preset) {
+function renderBible(core, preset) {
   const cards = [
-    ["Character Bible", `${core.protagonist}: diện mạo ổn định, trang phục có một chi tiết nhận diện, cảm xúc tiến từ khép kín sang mở sáng.`],
-    ["Prop Bible", `${core.symbol}: giữ hình dáng, chất liệu, màu chủ đạo và vị trí xuất hiện có chủ đích.`],
-    ["World Bible", "Không gian được kể bằng dấu vết sinh hoạt, ánh sáng, đồ vật và texture thay vì lời giải thích."],
-    ["Camera Bible", "Ưu tiên close-up cảm xúc, reaction shot, match cut và camera motion có lý do cảm xúc."],
-    ["Lighting Bible", "Ánh sáng phản ánh arc: đầu phim hẹp và thấp, cuối phim rộng và ấm hơn."],
-    ["Sound Bible", preset.music]
+    ["Character Bible", `${core.protagonist}: có vết yếu thật, không hoàn hảo, chuyển từ co lại sang dám hiện diện.`],
+    ["Symbol Bible", `${core.symbol}: xuất hiện ba lần, mỗi lần đổi nghĩa sâu hơn.`],
+    ["World Bible", "Thế giới phải có dấu vết người sống thật: đồ cũ, ánh sáng không hoàn hảo, khoảng trống có ký ức."],
+    ["Camera Bible", "Close-up cho sự thật, wide shot cho cô đơn, dolly-in chỉ khi nhân vật nhận ra điều gì."],
+    ["Sound Bible", preset.music],
+    ["GLOW Taste", "Ít hơn nhưng đúng hơn. Đẹp không được phản bội sự thật."]
   ];
-
-  document.querySelector("#visualBible").innerHTML = cards
-    .map(
-      ([title, body]) => `
-        <div class="bible-card">
-          <strong>${title}</strong>
-          <p>${body}</p>
-          <div class="color-row">
-            ${preset.palette.map((color) => `<span class="swatch" style="background:${color}"></span>`).join("")}
-          </div>
-          <p><em>${preset.style}</em></p>
-        </div>
-      `
-    )
-    .join("");
+  document.querySelector("#visualBible").innerHTML = cards.map(([title, body]) => `
+    <div class="bible-card">
+      <strong>${escapeHtml(title)}</strong>
+      <p>${escapeHtml(body)}</p>
+      <div class="color-row">${preset.palette.map((color) => `<span class="swatch" style="background:${color}"></span>`).join("")}</div>
+      <p><em>${escapeHtml(preset.style)}</em></p>
+    </div>`).join("");
 }
 
 function renderStoryboard(scenes) {
   document.querySelector("#sceneCount").textContent = `${scenes.length} scene`;
   const list = document.querySelector("#storyboardList");
   list.classList.remove("empty");
-  list.innerHTML = scenes
-    .map(
-      (scene) => `
-        <div class="scene-card">
-          <div class="scene-num">Scene ${scene.number}<br>${scene.duration}</div>
-          <div>
-            <h4>${scene.title}</h4>
-            <p>${scene.purpose}</p>
-            <p><strong>Action:</strong> ${scene.action}</p>
-          </div>
-          <div class="scene-meta">
-            <span><strong>Emotion:</strong> ${scene.emotion}</span>
-            <span><strong>Camera:</strong> ${scene.camera}</span>
-            <span><strong>Sound:</strong> ${scene.sound}</span>
-          </div>
-        </div>
-      `
-    )
-    .join("");
+  list.innerHTML = scenes.map((scene) => `
+    <div class="scene-card">
+      <div class="scene-num">Scene ${scene.number}<br>${escapeHtml(scene.duration)}</div>
+      <div>
+        <h4>${escapeHtml(scene.title)}</h4>
+        <p>${escapeHtml(scene.purpose)}</p>
+        <p><strong>Action:</strong> ${escapeHtml(scene.action)}</p>
+        <p><strong>Narration/Sound:</strong> ${escapeHtml(scene.narration)}</p>
+      </div>
+      <div class="scene-meta">
+        <span><strong>Emotion:</strong> ${escapeHtml(scene.emotion)}</span>
+        <span><strong>Camera:</strong> ${escapeHtml(scene.camera)}</span>
+        <span><strong>Sound:</strong> ${escapeHtml(scene.sound)}</span>
+      </div>
+    </div>`).join("");
 }
 
 function renderPrompts(scenes, core, preset) {
   document.querySelector("#imagePrompts").classList.remove("empty");
   document.querySelector("#motionPrompts").classList.remove("empty");
-
-  document.querySelector("#imagePrompts").innerHTML = scenes
-    .slice(0, 4)
-    .map(
-      (scene) => `
-        <div class="prompt-item">
-          <strong>Keyframe ${scene.number}</strong>
-          <p>${scene.action} ${preset.style}. Subject: ${core.protagonist}. Prop continuity: ${core.symbol}. Lighting follows emotion "${scene.emotion}".</p>
-        </div>
-      `
-    )
-    .join("");
-
-  document.querySelector("#motionPrompts").innerHTML = scenes
-    .slice(0, 4)
-    .map(
-      (scene) => `
-        <div class="prompt-item">
-          <strong>Clip ${scene.number}A</strong>
-          <p>8-second cinematic shot. Character motion: subtle purposeful movement. Secondary motion: fabric, hands, breath. Environment motion: natural ambience. Camera: ${scene.camera}. Emotional change: move toward "${scene.emotion}". Sound: ${scene.sound}.</p>
-        </div>
-      `
-    )
-    .join("");
+  document.querySelector("#imagePrompts").innerHTML = scenes.map((scene) => `
+    <div class="prompt-item">
+      <strong>Keyframe ${scene.number}: ${escapeHtml(scene.title)}</strong>
+      <p>${escapeHtml(scene.action)} Subject continuity: ${escapeHtml(core.protagonist)}. Symbol continuity: ${escapeHtml(core.symbol)}. Lighting follows "${escapeHtml(scene.emotion)}". Style: ${escapeHtml(preset.style)}.</p>
+    </div>`).join("");
+  document.querySelector("#motionPrompts").innerHTML = scenes.map((scene) => `
+    <div class="prompt-item">
+      <strong>Clip ${scene.number}A</strong>
+      <p>8-second cinematic shot. Character motion: subtle, emotionally motivated. Secondary motion: hands, fabric, breath. Environment motion: natural ambience. Camera: ${escapeHtml(scene.camera)}. Emotional change: ${escapeHtml(scene.emotion)}. Sound: ${escapeHtml(scene.sound)}.</p>
+    </div>`).join("");
 }
 
-function renderQa(core, preset, target) {
+function renderQa(core, preset, platform) {
   const checks = [
-    ["ok", "Character consistency", `Giữ ${core.protagonist} bằng character bible và reference prompt cố định.`],
-    ["ok", "Prop consistency", `${core.symbol} cần cùng chất liệu, màu, trạng thái qua toàn phim.`],
-    ["warn", "Narration risk", `${preset.narration}. Nếu video còn giống audiobook, tăng reaction shot và silent moment.`],
-    ["warn", "Audience fit", `Target "${target}" cần kiểm lại nhịp dựng, độ rõ thông điệp và mức phức tạp hình ảnh.`],
-    ["risk", "Model drift", "Mỗi clip AI video nên có first frame/last frame hoặc image reference để giảm trôi continuity."]
+    ["ok", "Hook honesty", "Hook mở vòng tò mò nhưng không clickbait, không phản bội câu chuyện."],
+    ["ok", "Human truth", `Mọi scene phải bảo vệ sự thật: ${core.truth}.`],
+    ["warn", "Narration risk", `${preset.narration}. Nếu còn giống audiobook, chuyển thêm câu kể thành reaction hoặc symbol.`],
+    ["warn", "Retention", `${platform.scriptUnit} Kiểm tra mỗi beat có lý do để xem tiếp.`],
+    ["risk", "AI video drift", "Mỗi clip phải có character, prop, costume, lighting anchors để chống trôi continuity."],
+    ["risk", "Moral drift", "Nếu bản dựng cố làm người xem khóc bằng bi kịch cưỡng ép, rewrite."]
   ];
-
   document.querySelector("#continuityList").classList.remove("empty");
-  document.querySelector("#continuityList").innerHTML = checks
-    .map(
-      ([level, title, body]) => `
-        <div class="check-item ${level}">
-          <strong>${title}</strong>
-          <p>${body}</p>
-        </div>
-      `
-    )
-    .join("");
+  document.querySelector("#continuityList").innerHTML = checks.map(([level, title, body]) => `
+    <div class="check-item ${level}">
+      <strong>${escapeHtml(title)}</strong>
+      <p>${escapeHtml(body)}</p>
+    </div>`).join("");
 
   document.querySelector("#criticNotes").classList.remove("empty");
   document.querySelector("#criticNotes").innerHTML = renderList([
-    "Tăng sức quốc tế bằng cảm xúc phổ quát: mất mát, hy vọng, can đảm, biết ơn.",
-    "Giảm lời giải thích ở cao trào; để hình ảnh tạo payoff.",
-    "Mỗi scene cần một thay đổi cảm xúc cụ thể, không chỉ minh họa nội dung.",
-    "Kết thúc nên có visual callback rõ với biểu tượng trung tâm."
+    "Nâng cấp mạnh nhất: tìm một chi tiết đời thật chưa ai để ý và biến nó thành symbol.",
+    "Cắt mọi câu giải thích sau khi hình ảnh đã nói được.",
+    "Đừng cố làm phim lớn. Làm một khoảnh khắc nhỏ nhưng đúng đến mức người xem thấy mình.",
+    "Kết thúc phải mở ra reflection, không đóng bằng đạo lý."
   ]);
 }
 
-function updateScores(text, minutes) {
-  const words = getWords(text).length;
-  const density = Math.min(20, Math.round(words / 20));
-  document.querySelector("#cinemaScore").textContent = Math.min(96, 72 + density);
-  document.querySelector("#continuityScore").textContent = Math.min(94, 78 + Math.round(minutes * 1.5));
-  document.querySelector("#narrationScore").textContent = Math.max(68, 92 - Math.round(words / 80));
+function updateScores(text, core) {
+  const lower = text.toLowerCase();
+  const hook = Math.min(98, 70 + (lower.includes("?") ? 8 : 0) + (core.symbol !== "một chi tiết lặp lại" ? 10 : 0) + Math.min(10, getSentences(text).length));
+  const emotion = Math.min(98, 68 + ["mẹ", "cha", "sợ", "buồn", "lặng", "run", "mỉm cười", "nhận ra"].filter((w) => lower.includes(w)).length * 4);
+  const viral = Math.min(96, 62 + (core.symbol !== "một chi tiết lặp lại" ? 12 : 0) + (lower.includes("hiểu") || lower.includes("nhận ra") ? 10 : 0) + (lower.includes("mẹ") || lower.includes("cha") ? 8 : 0));
+  const glow = Math.min(99, 72 + (lower.includes("lặng") ? 8 : 0) + (lower.includes("giá trị") ? 6 : 0) + (lower.includes("hy sinh") ? 7 : 0));
+  document.querySelector("#hookScore").textContent = hook;
+  document.querySelector("#emotionScore").textContent = emotion;
+  document.querySelector("#viralScore").textContent = viral;
+  document.querySelector("#glowScore").textContent = glow;
 }
 
 function generatePackage() {
@@ -502,19 +421,20 @@ function generatePackage() {
     storyInput.value = sampleStory;
     updateWordCount();
   }
-
   const preset = genrePresets[genreSelect.value];
+  const platform = platformRules[targetSelect.value];
   const core = inferCore(text);
-  const scenes = makeScenes(core, preset, Number(lengthRange.value));
+  const scenes = makeScenes(core, preset, platform, Number(lengthRange.value));
 
-  renderStoryCore(core);
-  renderGlowDna(text, core);
+  renderWarRoom(core, preset, platform, text);
+  renderAgents();
+  renderScriptLab(core, platform);
   renderAdaptation(text, preset);
-  renderVisualBible(core, preset);
+  renderBible(core, preset);
   renderStoryboard(scenes);
   renderPrompts(scenes, core, preset);
-  renderQa(core, preset, targetSelect.options[targetSelect.selectedIndex].text);
-  updateScores(text, Number(lengthRange.value));
+  renderQa(core, preset, platform);
+  updateScores(text, core);
 }
 
 document.querySelectorAll(".tab").forEach((tab) => {

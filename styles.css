@@ -223,7 +223,7 @@ output {
 }
 
 .score-strip {
-  min-width: 310px;
+  min-width: 390px;
   padding: 10px;
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -231,7 +231,7 @@ output {
 }
 
 .score-strip div {
-  min-width: 84px;
+  min-width: 78px;
   text-align: center;
 }
 
@@ -346,7 +346,8 @@ article h3 {
 
 .bible-grid,
 .dna-grid,
-.model-grid {
+.model-grid,
+.agent-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
@@ -354,7 +355,8 @@ article h3 {
 
 .bible-card,
 .dna-card,
-.model-card {
+.model-card,
+.agent-card {
   border: 1px solid var(--line);
   border-radius: 8px;
   background: #fff;
@@ -413,11 +415,99 @@ article h3 {
 .bible-card p,
 .dna-card p,
 .model-card p,
+.agent-card p,
+.script-row p,
 .prompt-item p,
 .check-item p {
   margin: 0;
   color: var(--muted);
   line-height: 1.45;
+}
+
+.agent-card {
+  position: relative;
+  overflow: hidden;
+  min-height: 220px;
+}
+
+.agent-card h3 {
+  margin-right: 52px;
+}
+
+.agent-index {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  color: rgba(15, 118, 110, 0.18);
+  font-size: 34px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.agent-card span {
+  display: inline-block;
+  margin-top: 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 5px 9px;
+  color: var(--accent-strong);
+  background: #e9fbf8;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.curve {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  min-height: 220px;
+  align-items: end;
+  gap: 8px;
+}
+
+.curve-step {
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+  gap: 6px;
+  border-radius: 8px;
+  padding: 10px 8px;
+  background: linear-gradient(180deg, #0f766e, #2563eb);
+  color: #fff;
+}
+
+.curve-step strong {
+  font-size: 18px;
+}
+
+.curve-step span {
+  font-size: 11px;
+  line-height: 1.25;
+}
+
+.script-list {
+  display: grid;
+  gap: 12px;
+}
+
+.script-row {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fffdfa;
+  padding: 14px;
+}
+
+.script-row div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.script-row span {
+  color: var(--accent-strong);
+  font-size: 12px;
+  font-weight: 800;
+  text-align: right;
 }
 
 .scene-meta {
@@ -508,6 +598,8 @@ article h3 {
   .bible-grid,
   .dna-grid,
   .model-grid,
+  .agent-grid,
+  .curve,
   .loop-track {
     grid-template-columns: 1fr;
   }
@@ -538,6 +630,6 @@ article h3 {
 
   .score-strip {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
   }
 }
