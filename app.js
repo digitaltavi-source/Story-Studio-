@@ -121,6 +121,39 @@ const glowDna = {
     "Có khoảng lặng đúng lúc, không sợ im lặng.",
     "Hiệu ứng âm thanh không lấn át sự thật.",
     "Nếu nghi ngờ, làm ít hơn."
+  ],
+  operatingModel: [
+    {
+      title: "Essence Layer",
+      body: "Giữ la bàn đạo đức, linh hồn, purpose và emotional coherence của từng câu chuyện."
+    },
+    {
+      title: "Cognitive Layer",
+      body: "Hiểu ngữ cảnh, cảm xúc, theme, symbol, character arc trước khi tạo prompt hoặc storyboard."
+    },
+    {
+      title: "Operational Layer",
+      body: "Biến hiểu biết thành workflow có truy vết: input, reasoning, output, QA, reflection."
+    },
+    {
+      title: "Expansion Layer",
+      body: "Thiết kế để mở rộng qua thể loại, ngôn ngữ, nền tảng video mà không mất linh hồn."
+    },
+    {
+      title: "Five Flames",
+      body: "Truth, Empathy, Integrity, Growth, Awareness là bộ lọc trước mọi lựa chọn sáng tạo."
+    },
+    {
+      title: "Cultural Lens",
+      body: "Global không có nghĩa đồng nhất. Câu chuyện cần được thấu hiểu ở nhiều nền văn hóa."
+    }
+  ],
+  reflectionLoop: [
+    ["Observe", "Đọc script/audio với ngữ cảnh và cảm xúc."],
+    ["Understand", "Tách theme, ý định, symbol và sự thật con người."],
+    ["Reflect", "Soi qua ethics, empathy, bias và risk of manipulation."],
+    ["Create", "Sinh storyboard, prompts, sound design có mục đích."],
+    ["Evolve", "Ghi lại bài học và tinh chỉnh phiên bản tiếp theo."]
   ]
 };
 
@@ -252,6 +285,28 @@ function renderGlowDna(text, core) {
     )
     .join("");
 
+  document.querySelector("#glowOperatingModel").innerHTML = glowDna.operatingModel
+    .map(
+      (item) => `
+        <div class="model-card">
+          <strong>${item.title}</strong>
+          <p>${item.body}</p>
+        </div>
+      `
+    )
+    .join("");
+
+  document.querySelector("#reflectionLoop").innerHTML = glowDna.reflectionLoop
+    .map(
+      ([title, body]) => `
+        <div class="loop-step">
+          <strong>${title}</strong>
+          <span>${body}</span>
+        </div>
+      `
+    )
+    .join("");
+
   const lower = text.toLowerCase();
   const storySignals = [
     lower.includes("nhận ra") || lower.includes("hiểu") || lower.includes("lặng"),
@@ -289,8 +344,11 @@ function renderGlowDna(text, core) {
   document.querySelector("#glowAlignment").innerHTML = renderList([
     `Linh hồn cần giữ: ${core.theme}`,
     `Biểu tượng chuyển hóa: ${core.symbol}`,
+    "Bốn tầng GLOW phải cùng hiện diện: linh hồn, nhận thức, vận hành, mở rộng.",
+    "Năm ngọn lửa Truth, Empathy, Integrity, Growth, Awareness là bộ lọc trước khi xuất.",
     "Mọi prompt phải ưu tiên sự thật cảm xúc trước kỹ thuật đẹp.",
     "Không thêm nhạc, thoại, hiệu ứng hoặc twist nếu chúng làm người xem bị dẫn dắt thay vì tự chạm.",
+    "Mọi output cần đi qua Observe -> Understand -> Reflect -> Create -> Evolve.",
     "QA cuối cùng phải hỏi: phim này có gieo một hạt mầm chuyển hóa không?"
   ]);
 }

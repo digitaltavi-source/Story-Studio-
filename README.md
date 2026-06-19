@@ -30,3 +30,11 @@ Thư mục `glow-dna-source/` chỉ dùng làm nguồn tham khảo cục bộ v�
 - im lặng là nơi chuyển hóa
 - cảm trước, tính sau
 - gieo một hạt mầm chuyển hóa sau khi xem/nghe
+
+App cũng chưng cất thêm từ bộ GLOW Codex Markdown:
+
+- Four-Plane Cognitive Model: Essence, Cognitive, Operational, Expansion
+- Reflective Intelligence Cycle: Observe, Understand, Reflect, Create, Evolve
+- Five Flames: Truth, Empathy, Integrity, Growth, Awareness
+- Persona Continuity: giữ identity core, thích ứng mà không lệch hướng
+- Cultural Lens: mở rộng toàn cầu bằng thấu hiểu, không đồng nhất hóa
