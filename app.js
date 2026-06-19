@@ -599,3 +599,394 @@ lengthRange.addEventListener("input", () => {
 generateBtn.addEventListener("click", generatePackage);
 
 updateWordCount();
+
+function analyzeSource(text) {
+  const sentences = getSentences(text);
+  const evidence = sentences.map((sentence, index) => ({
+    id: `E${index + 1}`,
+    text: sentence,
+    lower: sentence.toLowerCase()
+  }));
+  const allLower = text.toLowerCase();
+  const addUnique = (list, item) => {
+    if (item && !list.some((existing) => existing.name === item.name)) list.push(item);
+  };
+
+  const characters = [];
+  const nameMatches = [...text.matchAll(/(?:tên|là)\s+([A-ZÀ-Ỹ][\p{L}]{1,20})/gu)];
+  nameMatches.forEach((match) => {
+    const found = evidence.find((item) => item.text.includes(match[1]));
+    addUnique(characters, { name: match[1], type: "named", evidence: found?.id || "E?" });
+  });
+
+  [
+    ["mẹ", "family"],
+    ["má", "family"],
+    ["cha", "family"],
+    ["bố", "family"],
+    ["ba", "family"],
+    ["ông", "family"],
+    ["bà", "family"],
+    ["thầy giáo", "school"],
+    ["cô giáo", "school"],
+    ["thầy", "school"],
+    ["cô", "school"],
+    ["cả lớp", "collective"],
+    ["bạn", "collective"]
+  ].forEach(([name, type]) => {
+    if (allLower.includes(name)) {
+      const found = evidence.find((item) => item.lower.includes(name));
+      addUnique(characters, { name, type, evidence: found?.id || "E?" });
+    }
+  });
+
+  const props = [];
+  [
+    "áo", "đèn", "đèn dầu", "nhà", "sông", "sân khấu", "lớp", "quần áo", "bàn ăn",
+    "cửa", "ghế", "vải", "đường chỉ", "bài hát", "buổi biểu diễn"
+  ].forEach((name) => {
+    if (allLower.includes(name)) {
+      const found = evidence.find((item) => item.lower.includes(name));
+      addUnique(props, { name, evidence: found?.id || "E?" });
+    }
+  });
+
+  const mainCharacter = characters.find((item) => item.type === "named")?.name || characters[0]?.name || "nhân vật chính chưa định danh";
+  const symbol = props.find((item) => ["áo", "đèn dầu", "đường chỉ", "bài hát"].includes(item.name))?.name || props[0]?.name || "chi tiết trung tâm chưa rõ";
+  const hasFamily = characters.some((item) => item.type === "family");
+  const hasSchool = characters.some((item) => item.type === "school" || item.type === "collective");
+  const hasRealization = allLower.includes("nhận ra") || allLower.includes("hiểu") || allLower.includes("bỗng");
+
+  const approvals = [];
+  if (mainCharacter.includes("chưa định danh")) approvals.push("Chưa tìm thấy tên/nhân vật chính rõ ràng. App dùng nhãn tạm và cần bạn xác nhận.");
+  if (symbol.includes("chưa rõ")) approvals.push("Chưa tìm thấy biểu tượng trung tâm đủ rõ. Cần chọn một đạo cụ/chi tiết làm motif.");
+  approvals.push("Theme, wound và viral angle là SUY LUẬN từ bằng chứng, cần human approval trước sản xuất.");
+
+  return {
+    sentences,
+    evidence,
+    characters,
+    props,
+    mainCharacter,
+    symbol,
+    hasFamily,
+    hasSchool,
+    hasRealization,
+    approvals
+  };
+}
+
+function groundedCore(text) {
+  const source = analyzeSource(text);
+  const lower = text.toLowerCase();
+  const truth = source.hasFamily
+    ? "tình yêu thường nằm trong những việc nhỏ mà ta từng xem là bình thường"
+    : source.hasRealization
+      ? "con người thay đổi khi tự nhận ra điều thật, không phải khi bị giảng giải"
+      : "một lựa chọn nhỏ có thể làm lộ ra giá trị thật của nhân vật";
+  const wound = lower.includes("cũ") || lower.includes("nghèo") || lower.includes("thiếu")
+    ? "mặc cảm vì thiếu thốn hoặc vì thấy mình kém hơn người khác"
+    : "một khoảng thiếu bên trong chưa được gọi tên rõ";
+  const desire = source.hasSchool
+    ? "được xuất hiện trước người khác mà không xấu hổ"
+    : "được nhìn nhận mà vẫn giữ được phẩm giá thật";
+
+  return {
+    ...source,
+    logline: source.sentences[0] || "Chưa có đủ dữ liệu truyện.",
+    protagonist: source.mainCharacter,
+    falseBelief: "Mình chỉ có giá trị khi bên ngoài đủ tốt hoặc đủ được công nhận.",
+    wound,
+    desire,
+    truth,
+    promise: `Người xem nhận ra: ${truth}.`,
+    emotionalSpine: ["mở tò mò", "tự soi", "áp lực", "lặng nhận ra", "lựa chọn", "dư âm"]
+  };
+}
+
+function evidenceLabel(source, text) {
+  const lower = text.toLowerCase();
+  const hit = source.evidence.find((item) => lower.includes(item.text.toLowerCase().slice(0, 24)) || item.text.toLowerCase().includes(lower.slice(0, 24)));
+  return hit?.id || source.evidence[0]?.id || "E?";
+}
+
+function transformSentenceToVisual(sentence, core) {
+  const lower = sentence.toLowerCase();
+  if (lower.includes("nhận ra") || lower.includes("hiểu")) return `Giữ máy trên ${core.protagonist}; không nói bài học, để ánh mắt dừng lại trên ${core.symbol}.`;
+  if (lower.includes("nói")) return `Đưa thông tin thành hành động nghe - phản ứng; máy bắt phản ứng của ${core.protagonist} sau câu nói.`;
+  if (lower.includes("cúi") || lower.includes("run") || lower.includes("lặng")) return `Cận tay/mắt/hơi thở của ${core.protagonist}; để cơ thể kể cảm xúc thay lời.`;
+  if (lower.includes("áo") || lower.includes("đèn") || lower.includes("nhà")) return `Dùng chi tiết vật thể và không gian trong câu nguồn để kể hoàn cảnh, không thêm nhân vật mới.`;
+  return `Dựng lại hành động đúng theo câu nguồn, ưu tiên quan sát hơn giải thích.`;
+}
+
+function makeGroundedScript(core, platform, minutes) {
+  const usable = core.evidence.slice(0, Math.max(4, Math.min(10, core.evidence.length)));
+  const totalSeconds = minutes * 60;
+  const perBeat = Math.max(8, Math.floor(totalSeconds / Math.max(usable.length, 1)));
+  return usable.map((item, index) => {
+    const start = index * perBeat;
+    const end = start + perBeat;
+    const isOpening = index === 0;
+    const isLast = index === usable.length - 1;
+    return {
+      beat: isOpening ? "Opening Image" : isLast ? "Emotional Payoff" : `Grounded Beat ${index + 1}`,
+      time: `${Math.floor(start / 60)}:${String(start % 60).padStart(2, "0")} - ${Math.floor(end / 60)}:${String(end % 60).padStart(2, "0")}`,
+      evidence: item.id,
+      source: item.text,
+      visual: isOpening
+        ? `Mở bằng một hình ảnh lấy trực tiếp từ ${item.id}: ${transformSentenceToVisual(item.text, core)}`
+        : transformSentenceToVisual(item.text, core),
+      narration: item.lower.includes("nhận ra") || item.lower.includes("hiểu")
+        ? "GIẢM LỜI: chỉ giữ một câu rất ngắn hoặc bỏ narration để hình ảnh trả nghĩa."
+        : `Narration gợi ý, bám nguồn: "${item.text.length > 120 ? item.text.slice(0, 117) + "..." : item.text}"`,
+      dialogue: item.lower.includes("nói") ? "Có thể chuyển phần 'nói rằng' thành thoại ngắn, không thêm nội dung ngoài câu nguồn." : "Không thêm thoại nếu câu nguồn không có lời nói.",
+      sound: isLast ? "Giảm nhạc, để room tone và dư âm; không ép nước mắt." : "Foley cụ thể từ vật thể/bối cảnh trong câu nguồn; nhạc rất tiết chế.",
+      retention: platform.retention[index] || "Giữ bằng một câu hỏi cảm xúc chưa trả lời."
+    };
+  });
+}
+
+function makeGroundedScenes(core, preset, platform, minutes) {
+  return makeGroundedScript(core, platform, minutes).map((beat, index) => ({
+    number: index + 1,
+    duration: beat.time,
+    title: beat.beat,
+    purpose: beat.retention,
+    action: beat.visual,
+    narration: beat.narration,
+    dialogue: beat.dialogue,
+    emotion: core.emotionalSpine[Math.min(index, core.emotionalSpine.length - 1)],
+    camera: index === 0 ? "locked close-up or slow reveal from source object" : "motivated camera only; no decorative movement",
+    sound: beat.sound,
+    evidence: beat.evidence,
+    source: beat.source,
+    style: preset.style
+  }));
+}
+
+function renderEvidence(core) {
+  document.querySelector("#characterLock").classList.remove("empty");
+  document.querySelector("#characterLock").innerHTML = core.characters.length
+    ? core.characters.map((item) => `<div class="evidence-item"><strong>${escapeHtml(item.name)}</strong><p>Type: ${escapeHtml(item.type)} | Evidence: ${escapeHtml(item.evidence)}</p></div>`).join("")
+    : `<div class="evidence-item"><strong>Cần xác nhận</strong><p>Không phát hiện nhân vật rõ ràng. App không được tự thêm ông/bà/mẹ/cha nếu input không có.</p></div>`;
+
+  document.querySelector("#worldLock").classList.remove("empty");
+  document.querySelector("#worldLock").innerHTML = core.props.length
+    ? core.props.map((item) => `<div class="evidence-item"><strong>${escapeHtml(item.name)}</strong><p>Evidence: ${escapeHtml(item.evidence)}</p></div>`).join("")
+    : `<div class="evidence-item"><strong>Cần xác nhận</strong><p>Chưa phát hiện đạo cụ/bối cảnh đủ rõ để khóa continuity.</p></div>`;
+
+  document.querySelector("#evidenceLedger").classList.remove("empty");
+  document.querySelector("#evidenceLedger").innerHTML = core.evidence.map((item) => `
+    <div class="evidence-item">
+      <strong>${escapeHtml(item.id)}</strong>
+      <p>${escapeHtml(item.text)}</p>
+    </div>`).join("");
+
+  document.querySelector("#approvalList").classList.remove("empty");
+  document.querySelector("#approvalList").innerHTML = core.approvals.map((item) => `
+    <div class="check-item warn">
+      <strong>Cần duyệt</strong>
+      <p>${escapeHtml(item)}</p>
+    </div>`).join("");
+}
+
+function makeGroundedHooks(core, platform) {
+  const evidence = core.evidence[0]?.id || "E?";
+  const objectHook = core.symbol.includes("chưa rõ")
+    ? `Có một chi tiết trong câu chuyện này đang giữ phần thật nhất của ${core.protagonist}.`
+    : `Nếu ${core.symbol} có thể lên tiếng, nó sẽ kể điều gì về ${core.protagonist}?`;
+  const innerHook = `${core.protagonist} không thiếu giá trị. ${core.protagonist} chỉ chưa nhìn thấy giá trị ấy đúng cách.`;
+  const sourceHook = `Từ ${evidence}: một khoảnh khắc rất nhỏ mở ra cả câu chuyện.`;
+  return [
+    ["Visual Hook", objectHook, platform.opening, evidence],
+    ["Psychological Hook", innerHook, "Mở bằng wound, không thêm sự kiện mới.", evidence],
+    ["Source-Grounded Hook", sourceHook, "Hook này công khai bám bằng chứng, giảm nguy cơ bịa.", evidence]
+  ];
+}
+
+function renderWarRoom(core, preset, platform, text) {
+  document.querySelector("#storyCore").classList.remove("empty");
+  document.querySelector("#storyCore").innerHTML = `
+    <p><strong>Logline nguồn:</strong> ${escapeHtml(core.logline)}</p>
+    <p><strong>Human truth [SUY LUẬN]:</strong> ${escapeHtml(core.truth)}</p>
+    <p><strong>Wound [SUY LUẬN]:</strong> ${escapeHtml(core.wound)}</p>
+    <p><strong>Desire [SUY LUẬN]:</strong> ${escapeHtml(core.desire)}</p>
+    <p><strong>False belief [SUY LUẬN]:</strong> ${escapeHtml(core.falseBelief)}</p>
+    <div class="pill-list">
+      <span class="pill">Nhân vật khóa: ${escapeHtml(core.protagonist)}</span>
+      <span class="pill">Symbol khóa: ${escapeHtml(core.symbol)}</span>
+      <span class="pill">${escapeHtml(preset.title)}</span>
+      <span class="pill">${escapeHtml(platform.title)}</span>
+    </div>`;
+
+  document.querySelector("#viralThesis").classList.remove("empty");
+  document.querySelector("#viralThesis").innerHTML = renderList([
+    `Viral angle [SUY LUẬN]: ${core.symbol} biến một cảm xúc nhỏ thành câu hỏi lớn.`,
+    `Audience mirror [SUY LUẬN]: người từng thấy mình chưa đủ tốt sẽ dừng lại.`,
+    `Share reason: gửi cho người liên quan trực tiếp tới nhân vật có trong nguồn: ${core.characters.map((item) => item.name).join(", ") || "chưa xác định"}.`,
+    `Promise: ${preset.promise}`
+  ]);
+
+  document.querySelector("#retentionCurve").classList.remove("empty");
+  document.querySelector("#retentionCurve").innerHTML = platform.retention.map((label, index) => `<div class="curve-step" style="height:${64 + index * 14}px"><strong>${index + 1}</strong><span>${escapeHtml(label)}</span></div>`).join("");
+
+  document.querySelector("#glowAlignment").classList.remove("empty");
+  document.querySelector("#glowAlignment").innerHTML = renderList([
+    "Không thêm nhân vật ngoài Character Lock.",
+    "Không biến suy luận thành dữ kiện.",
+    "Không dùng bất kỳ vai nhân vật nào nếu input không có bằng chứng cho vai đó.",
+    "Mỗi scene, hook, prompt phải có evidence ID.",
+    `Nguồn hiện có ${core.evidence.length} câu, ${core.characters.length} nhân vật/nhóm, ${core.props.length} đạo cụ/bối cảnh được khóa.`
+  ]);
+}
+
+function renderScriptLab(core, platform) {
+  const hooks = makeGroundedHooks(core, platform);
+  document.querySelector("#hookLab").classList.remove("empty");
+  document.querySelector("#hookLab").innerHTML = hooks.map(([label, hook, why, evidence]) => {
+    const improved = copyImprove(hook);
+    return `
+      <div class="prompt-item">
+        <strong>${escapeHtml(label)} | ${escapeHtml(evidence)}</strong>
+        <p>${escapeHtml(hook)}</p>
+        <p><b>Glow Copywriter:</b> ${escapeHtml(improved.text)} <span class="improvement">+${improved.improvement}% improved</span></p>
+        <p>${escapeHtml(why)}</p>
+      </div>`;
+  }).join("");
+
+  const beats = makeGroundedScript(core, platform, Number(lengthRange.value));
+  document.querySelector("#scriptDraft").classList.remove("empty");
+  document.querySelector("#scriptDraft").innerHTML = beats.map((beat, index) => `
+    <div class="script-row">
+      <div><strong>${index + 1}. ${escapeHtml(beat.beat)}</strong><span>${escapeHtml(beat.time)} | ${escapeHtml(beat.evidence)}</span></div>
+      <p><b>Câu nguồn:</b> ${escapeHtml(beat.source)}</p>
+      <p><b>Visual:</b> ${escapeHtml(beat.visual)}</p>
+      <p><b>Narration:</b> ${escapeHtml(beat.narration)}</p>
+      <p><b>Dialogue:</b> ${escapeHtml(beat.dialogue)}</p>
+      <p><b>Sound:</b> ${escapeHtml(beat.sound)}</p>
+      <p><b>Retention job:</b> ${escapeHtml(beat.retention)}</p>
+    </div>`).join("");
+
+  const characterShare = core.characters.map((item) => item.name).filter(Boolean);
+  document.querySelector("#shareTriggers").classList.remove("empty");
+  document.querySelector("#shareTriggers").innerHTML = renderList([
+    characterShare.length ? `Gửi cho người liên quan tới: ${characterShare.join(", ")}.` : "Chưa có nhân vật rõ để tạo share trigger cá nhân hóa.",
+    `Gửi cho người đang có wound tương tự: ${core.wound}.`,
+    "Gửi cho người thích câu chuyện nhỏ, thật, không lên lớp."
+  ]);
+
+  document.querySelector("#commentPrompts").classList.remove("empty");
+  document.querySelector("#commentPrompts").innerHTML = renderList([
+    `Bạn từng có một "${core.symbol}" trong đời mình không?`,
+    "Có điều gì rất muộn bạn mới hiểu ra?",
+    "Câu nào trong câu chuyện này giống bạn nhất?"
+  ]);
+}
+
+function renderBible(core, preset) {
+  const cards = [
+    ["Character Lock", core.characters.length ? core.characters.map((item) => `${item.name} (${item.evidence})`).join("; ") : "Không thêm nhân vật mới nếu chưa được duyệt."],
+    ["Symbol Lock", `${core.symbol}. Chỉ dùng làm motif nếu có evidence trong Prop & Place Lock.`],
+    ["World Lock", core.props.length ? core.props.map((item) => `${item.name} (${item.evidence})`).join("; ") : "Bối cảnh cần được bạn xác nhận thêm."],
+    ["Camera Law", "Camera chỉ làm rõ lựa chọn/cảm xúc trong câu nguồn. Không dùng cảnh đẹp vô nghĩa."],
+    ["Sound Law", preset.music],
+    ["GLOW Taste", "Ít hơn nhưng đúng hơn. Mọi suy luận phải được gắn nhãn."]
+  ];
+  document.querySelector("#visualBible").innerHTML = cards.map(([title, body]) => `
+    <div class="bible-card">
+      <strong>${escapeHtml(title)}</strong>
+      <p>${escapeHtml(body)}</p>
+      <div class="color-row">${preset.palette.map((color) => `<span class="swatch" style="background:${color}"></span>`).join("")}</div>
+      <p><em>${escapeHtml(preset.style)}</em></p>
+    </div>`).join("");
+}
+
+function renderStoryboard(scenes) {
+  document.querySelector("#sceneCount").textContent = `${scenes.length} scene`;
+  const list = document.querySelector("#storyboardList");
+  list.classList.remove("empty");
+  list.innerHTML = scenes.map((scene) => `
+    <div class="scene-card">
+      <div class="scene-num">Scene ${scene.number}<br>${escapeHtml(scene.duration)}<br>${escapeHtml(scene.evidence)}</div>
+      <div>
+        <h4>${escapeHtml(scene.title)}</h4>
+        <p><strong>Câu nguồn:</strong> ${escapeHtml(scene.source)}</p>
+        <p><strong>Purpose:</strong> ${escapeHtml(scene.purpose)}</p>
+        <p><strong>Action:</strong> ${escapeHtml(scene.action)}</p>
+        <p><strong>Narration:</strong> ${escapeHtml(scene.narration)}</p>
+        <p><strong>Dialogue:</strong> ${escapeHtml(scene.dialogue)}</p>
+      </div>
+      <div class="scene-meta">
+        <span><strong>Emotion:</strong> ${escapeHtml(scene.emotion)}</span>
+        <span><strong>Camera:</strong> ${escapeHtml(scene.camera)}</span>
+        <span><strong>Sound:</strong> ${escapeHtml(scene.sound)}</span>
+      </div>
+    </div>`).join("");
+}
+
+function renderPrompts(scenes, core, preset) {
+  const characterAnchor = core.characters.map((item) => `${item.name} from ${item.evidence}`).join(", ") || "no new character without approval";
+  const propAnchor = core.props.map((item) => `${item.name} from ${item.evidence}`).join(", ") || "no invented prop";
+  document.querySelector("#imagePrompts").classList.remove("empty");
+  document.querySelector("#motionPrompts").classList.remove("empty");
+  document.querySelector("#imagePrompts").innerHTML = scenes.map((scene) => `
+    <div class="prompt-item">
+      <strong>Keyframe ${scene.number}: ${escapeHtml(scene.title)} | ${escapeHtml(scene.evidence)}</strong>
+      <p><b>Prompt:</b> ${escapeHtml(scene.action)} Cinematic still, ${escapeHtml(preset.style)}, emotionally truthful, grounded in source sentence: "${scene.source}". Character anchors: ${escapeHtml(characterAnchor)}. Prop/place anchors: ${escapeHtml(propAnchor)}. Lens: natural close observational lens. Lighting follows "${escapeHtml(scene.emotion)}".</p>
+      <p><b>Negative:</b> no extra characters, no invented old man, no unrelated props, no melodrama, no glossy advertisement look, no inconsistent costume.</p>
+    </div>`).join("");
+  document.querySelector("#motionPrompts").innerHTML = scenes.map((scene) => `
+    <div class="prompt-item">
+      <strong>Clip ${scene.number}A | ${escapeHtml(scene.evidence)}</strong>
+      <p><b>Video prompt:</b> 8-second grounded cinematic shot based only on ${escapeHtml(scene.evidence)}. Character motion: subtle and motivated by the source sentence. Secondary motion: hands, fabric, breath, or object movement only if present in evidence. Camera: ${escapeHtml(scene.camera)}. Emotional change: ${escapeHtml(scene.emotion)}. Sound: ${escapeHtml(scene.sound)}.</p>
+      <p><b>Continuity:</b> characters = ${escapeHtml(characterAnchor)}; props/places = ${escapeHtml(propAnchor)}; do not introduce any person, costume, setting, weather, or object not listed.</p>
+    </div>`).join("");
+}
+
+function renderQa(core, preset, platform) {
+  const checks = [
+    ["ok", "Source grounding", `Có ${core.evidence.length} evidence item. Mọi output phải trỏ về E-id.`],
+    ["ok", "Character lock", core.characters.length ? `Chỉ dùng: ${core.characters.map((item) => item.name).join(", ")}.` : "Chưa có nhân vật rõ; không được tự thêm."],
+    ["warn", "Inference boundary", "Theme/wound/desire là suy luận, cần bạn duyệt trước khi sản xuất."],
+    ["warn", "Narration risk", `${preset.narration}. Nếu còn giống audiobook, chuyển thêm câu kể thành reaction hoặc symbol.`],
+    ["risk", "Hallucination ban", "Cấm thêm bất kỳ nhân vật, quan hệ, đạo cụ hoặc bối cảnh nào nằm ngoài Character Lock và Prop/Place Lock."],
+    ["risk", "Award-level gap", "Muốn đạt giải, cần vòng human rewrite sau bản grounded draft: thêm taste, bất ngờ tinh tế và đạo diễn thật sự."]
+  ];
+  document.querySelector("#continuityList").classList.remove("empty");
+  document.querySelector("#continuityList").innerHTML = checks.map(([level, title, body]) => `
+    <div class="check-item ${level}">
+      <strong>${escapeHtml(title)}</strong>
+      <p>${escapeHtml(body)}</p>
+    </div>`).join("");
+
+  document.querySelector("#criticNotes").classList.remove("empty");
+  document.querySelector("#criticNotes").innerHTML = renderList([
+    "Bản app giờ ưu tiên đúng trước khi hay: không còn tự bịa nhân vật.",
+    "Muốn script chạm hơn nữa, cần bạn cung cấp bản truyện đủ dài hoặc cho phép app đề xuất thêm cảnh có gắn nhãn.",
+    "Prompt đã có negative constraint chống thêm nhân vật/đạo cụ ngoài nguồn.",
+    "Đẳng cấp festival không đến từ nhiều agent, mà từ rewrite nhiều vòng trên một human truth rất chính xác."
+  ]);
+}
+
+function generatePackage() {
+  const text = storyInput.value.trim() || sampleStory;
+  if (!storyInput.value.trim()) {
+    storyInput.value = sampleStory;
+    updateWordCount();
+  }
+  const preset = genrePresets[genreSelect.value];
+  const platform = platformRules[targetSelect.value];
+  const core = groundedCore(text);
+  const scenes = makeGroundedScenes(core, preset, platform, Number(lengthRange.value));
+
+  renderWarRoom(core, preset, platform, text);
+  renderEvidence(core);
+  renderAgents();
+  renderScriptLab(core, platform);
+  renderAdaptation(text, preset);
+  renderBible(core, preset);
+  renderStoryboard(scenes);
+  renderPrompts(scenes, core, preset);
+  renderQa(core, preset, platform);
+  updateScores(text, core);
+}

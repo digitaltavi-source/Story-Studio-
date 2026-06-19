@@ -521,6 +521,30 @@ article h3 {
   gap: 12px;
 }
 
+.evidence-list {
+  display: grid;
+  gap: 10px;
+}
+
+.evidence-item {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fffdfa;
+  padding: 12px;
+}
+
+.evidence-item strong {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--accent-strong);
+}
+
+.evidence-item p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
 .script-row {
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -540,6 +564,10 @@ article h3 {
   font-size: 12px;
   font-weight: 800;
   text-align: right;
+}
+
+.script-row p + p {
+  margin-top: 6px;
 }
 
 .scene-meta {
