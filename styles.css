@@ -427,7 +427,7 @@ article h3 {
 .agent-card {
   position: relative;
   overflow: hidden;
-  min-height: 220px;
+  min-height: 360px;
 }
 
 .agent-card h3 {
@@ -444,9 +444,10 @@ article h3 {
   line-height: 1;
 }
 
-.agent-card span {
+.agent-card span,
+.agent-intro strong {
   display: inline-block;
-  margin-top: 12px;
+  margin-bottom: 12px;
   border: 1px solid var(--line);
   border-radius: 999px;
   padding: 5px 9px;
@@ -454,6 +455,37 @@ article h3 {
   background: #e9fbf8;
   font-size: 12px;
   font-weight: 800;
+}
+
+.agent-intro {
+  margin-bottom: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  padding: 16px;
+  box-shadow: var(--shadow);
+}
+
+.agent-intro p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.agent-rules {
+  display: grid;
+  gap: 6px;
+  margin: 12px 0;
+}
+
+.agent-rules em {
+  display: block;
+  border-left: 3px solid var(--accent);
+  padding-left: 8px;
+  color: #343434;
+  font-size: 13px;
+  font-style: normal;
+  line-height: 1.35;
 }
 
 .curve {
@@ -534,6 +566,14 @@ article h3 {
 .check-item strong {
   display: block;
   margin-bottom: 6px;
+}
+
+.improvement {
+  display: inline-block;
+  margin-left: 6px;
+  color: var(--accent-strong);
+  font-size: 12px;
+  font-weight: 900;
 }
 
 .check-item.ok {

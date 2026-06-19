@@ -105,18 +105,136 @@ const platformRules = {
 };
 
 const agents = [
-  ["Story Truth Analyst", "Tìm sự thật con người", "Theme, wound, desire, false belief", "Nếu không tìm được nỗi thật, dừng sản xuất."],
-  ["Audience Psychologist", "Hiểu lý do người xem dừng lại", "Audience pain, mirror moment, share motive", "Không tối ưu view bằng thao túng cảm xúc."],
-  ["Viral Hook Architect", "Thiết kế 3 giây đầu", "Pattern interrupt, open loop, first image", "Hook phải thật với câu chuyện, không clickbait."],
-  ["Screenwriter", "Viết lại thành script phim", "Scene intention, dialogue, narration, silence", "Mỗi đoạn phải có đổi trạng thái cảm xúc."],
-  ["Narration Surgeon", "Cắt lời kể dư", "Keep, cut, image, dialogue, silence", "Không kể thứ hình ảnh đã tự kể được."],
-  ["Cinematic Director", "Dựng ngôn ngữ điện ảnh", "Blocking, lens, camera, rhythm, transition", "Camera move phải có lý do cảm xúc."],
-  ["Art Director", "Giữ thế giới và biểu tượng", "Character, prop, location, color, texture", "Không để style đẹp nhưng rỗng."],
-  ["Sound Director", "Thiết kế tai nghe cảm xúc", "Voice, room tone, foley, music, silence", "Nhạc nâng nền, không ra lệnh."],
-  ["Image Prompt Engineer", "Tạo keyframe nhất quán", "Subject, environment, lighting, lens, style", "Prompt phải có continuity anchors."],
-  ["Motion Prompt Engineer", "Tạo video prompt dùng được", "Character, secondary, camera, environment motion", "Không chỉ viết 'nhân vật chạy'."],
-  ["Continuity Supervisor", "Chống trôi nhân vật và đạo cụ", "Face, costume, time, weather, prop state", "Mỗi clip cần reference hoặc note nối cảnh."],
-  ["Festival Quality Critic", "Soát tầm quốc tế", "Originality, clarity, taste, restraint, impact", "Nếu quá lộ bài học, trả về rewrite."]
+  {
+    name: "Story Truth Analyst",
+    tier: "Chiến lược",
+    mission: "Tìm sự thật con người ẩn dưới cốt truyện.",
+    inspiration: "WIT Daily DNA, Pixar story spine, Robert McKee, GLOW Soul Manifesto.",
+    rules: ["Theme phải đến từ lựa chọn, không từ lời giảng.", "Nhân vật phải có wound, desire, false belief.", "Nếu câu chuyện chưa có sự thật con người, yêu cầu làm rõ trước khi viết."],
+    output: "Human truth, emotional wound, desire, false belief, symbol, transformation seed.",
+    fail: "Không tìm được điều khiến người xem thấy mình trong câu chuyện.",
+    metric: "Truth lift"
+  },
+  {
+    name: "Audience Psychologist",
+    tier: "Chiến lược",
+    mission: "Xác định vì sao người xem dừng lại, xem tiếp, bình luận và chia sẻ.",
+    inspiration: "Behavioral storytelling, audience empathy mapping, ethical retention design.",
+    rules: ["Không tối ưu view bằng sợ hãi rẻ hoặc thao túng.", "Mỗi insight phải nối với một cảm xúc phổ quát.", "Luôn tách audience pain khỏi platform trick."],
+    output: "Audience mirror, pain point, share motive, comment motive, retention risk.",
+    fail: "Chỉ nói chung chung 'cảm động' mà không chỉ ra ai sẽ cảm và vì sao.",
+    metric: "Mirror score"
+  },
+  {
+    name: "Viral Hook Architect",
+    tier: "Chiến lược",
+    mission: "Thiết kế 3 giây đầu có lực kéo nhưng không clickbait.",
+    inspiration: "Gary Halbert, Joe Sugarman, Maria Veloso, Claude Hopkins, modern short-form retention.",
+    rules: ["Hook phải mở một vòng tò mò thật.", "Không hứa điều video không trả.", "Ưu tiên hình ảnh nghịch lý hơn câu chữ phô trương."],
+    output: "Visual hook, psychological hook, share hook, first-frame brief, A/B variants.",
+    fail: "Hook gây tò mò nhưng phản bội tinh thần câu chuyện.",
+    metric: "Hook lift"
+  },
+  {
+    name: "Glow Copywriter",
+    tier: "Chiến lược",
+    mission: "Tối ưu mọi câu chữ để rõ, chạm, ngắn, tự nhiên và có sức chuyển hóa.",
+    inspiration: "Maria Veloso, Joe Sugarman, Gary Halbert, Claude Hopkins, WIT Audio restraint.",
+    rules: ["Giữ giọng của người viết, không bóp méo ý định gốc.", "Loại fluff, giữ precision và emotional clarity.", "Nếu input mơ hồ, phải yêu cầu làm rõ trước khi tối ưu.", "Luôn ước tính phần trăm cải thiện ở cuối bản tối ưu."],
+    output: "Optimized hook, narration, CTA, caption, title, improvement percentage.",
+    fail: "Câu chữ nghe quảng cáo, quá bóng bẩy hoặc mất sự thật.",
+    metric: "Copy lift"
+  },
+  {
+    name: "Screenwriter",
+    tier: "Sản xuất",
+    mission: "Chuyển story truth thành script có beat, hành động, silence và payoff.",
+    inspiration: "Pixar shorts, Disney emotional clarity, cinematic dramatic writing.",
+    rules: ["Mỗi beat phải đổi trạng thái cảm xúc.", "Đối thoại chỉ dùng khi hình ảnh không nói tốt hơn.", "Kết thúc mở reflection, không đóng bằng đạo lý."],
+    output: "Beat sheet, dialogue, narration, silent moments, visual payoff.",
+    fail: "Script chỉ kể lại truyện thay vì tái thiết kế trải nghiệm.",
+    metric: "Drama lift"
+  },
+  {
+    name: "Narration Surgeon",
+    tier: "Sản xuất",
+    mission: "Cắt lời kể dư và chuyển chữ thành hình ảnh, âm thanh, hành động.",
+    inspiration: "Show-don't-tell editing, WIT Audio remove-before-add doctrine.",
+    rules: ["Không kể thứ camera đã cho thấy.", "Triết lý phải biến thành lựa chọn hoặc callback.", "Giữ narration như nhịp thở, không như bài giảng."],
+    output: "Keep, cut, compress, image, dialogue, reaction, silence map.",
+    fail: "Video vẫn giống audiobook có hình minh họa.",
+    metric: "Narration reduction"
+  },
+  {
+    name: "Cinematic Director",
+    tier: "Sản xuất",
+    mission: "Biến script thành ngôn ngữ điện ảnh có camera, blocking và rhythm.",
+    inspiration: "Pixar visual storytelling, live-action short film grammar, visual poetry.",
+    rules: ["Camera move phải có lý do cảm xúc.", "Reaction shot quan trọng ngang action shot.", "Mỗi transition phải giữ nghĩa, không chỉ đẹp."],
+    output: "Shot intention, lens, camera motion, blocking, transition, rhythm notes.",
+    fail: "Cảnh đẹp nhưng không làm cảm xúc tiến thêm.",
+    metric: "Cinematic lift"
+  },
+  {
+    name: "Art Director",
+    tier: "Sản xuất",
+    mission: "Xây thế giới, nhân vật, đạo cụ và màu sắc giữ đúng linh hồn.",
+    inspiration: "Production design, character bible, GLOW brand warmth and clarity.",
+    rules: ["Style không được lấn át sự thật.", "Symbol phải đổi nghĩa qua phim.", "Mỗi chi tiết lớn phải có continuity anchor."],
+    output: "Character bible, prop bible, world bible, palette, texture, style guardrails.",
+    fail: "Đẹp nhưng generic, không có ký ức sống thật.",
+    metric: "World lift"
+  },
+  {
+    name: "Sound Director",
+    tier: "Sản xuất",
+    mission: "Thiết kế trải nghiệm cho tai mà không ra lệnh cảm xúc.",
+    inspiration: "WIT Audio manifesto, foley storytelling, restrained score design.",
+    rules: ["Nhạc nâng nền, không nói thay.", "Im lặng là nơi chuyển hóa.", "Nếu nghe thấy kỹ thuật trước sự thật, giảm lớp âm thanh."],
+    output: "Voice direction, room tone, foley, music cue, silence map, mix restraint.",
+    fail: "Âm thanh kéo nước mắt thay vì cho người xem tự chạm.",
+    metric: "Audio truth"
+  },
+  {
+    name: "Image Prompt Engineer",
+    tier: "Sản xuất",
+    mission: "Tạo keyframe prompts nhất quán, có cinematic taste và continuity.",
+    inspiration: "AI image production bibles, visual continuity, lens/composition grammar.",
+    rules: ["Prompt phải có subject, environment, light, lens, emotion, style.", "Mỗi nhân vật/đạo cụ cần anchor cố định.", "Không viết prompt trang trí rỗng."],
+    output: "Keyframe prompt pack, negative prompt, reference anchors, style tokens.",
+    fail: "Ảnh đẹp nhưng nhân vật/đạo cụ trôi qua từng cảnh.",
+    metric: "Keyframe consistency"
+  },
+  {
+    name: "Motion Prompt Engineer",
+    tier: "Sản xuất",
+    mission: "Tạo video prompt có chuyển động thật: nhân vật, camera, môi trường, cảm xúc.",
+    inspiration: "Veo/Runway/Kling prompt craft, animation blocking, shot continuity.",
+    rules: ["Không chỉ mô tả hành động bề mặt.", "Luôn có emotional change trong 8 giây.", "Secondary motion và environment motion phải hỗ trợ cảm xúc."],
+    output: "8-second clip prompts, first/last frame notes, motion layers, sound cue.",
+    fail: "Prompt chỉ viết 'nhân vật chạy/cười/khóc' mà không có động cơ.",
+    metric: "Motion clarity"
+  },
+  {
+    name: "Continuity Supervisor",
+    tier: "Kiểm định",
+    mission: "Chống drift nhân vật, đạo cụ, thời gian, ánh sáng, cảm xúc.",
+    inspiration: "Film continuity, AI video drift prevention, production QA.",
+    rules: ["Mỗi clip phải có state before/after.", "Costume, prop, weather, time phải nối logic.", "Cảm xúc không được nhảy cóc."],
+    output: "Continuity checklist, risk flags, fix notes, reference requirements.",
+    fail: "Video mất niềm tin vì mặt, đồ, thời gian hoặc cảm xúc bị trôi.",
+    metric: "Continuity score"
+  },
+  {
+    name: "Festival Quality Critic",
+    tier: "Kiểm định",
+    mission: "Soát tác phẩm theo tiêu chuẩn quốc tế: restraint, originality, clarity, impact.",
+    inspiration: "Festival shorts, Pixar taste, GLOW ethics, human-centered criticism.",
+    rules: ["Nói thẳng điểm yếu, không tâng bốc.", "Nếu quá lộ bài học, trả về rewrite.", "Tìm một chi tiết có thể làm phim đáng nhớ hơn."],
+    output: "Creative diagnosis, rewrite priority, taste notes, improvement percentage.",
+    fail: "Bản dựng đúng quy trình nhưng không chạm.",
+    metric: "Festival lift"
+  }
 ];
 
 function getWords(text) {
@@ -181,6 +299,21 @@ function makeHooks(core, platform) {
     hook,
     why: index === 0 ? platform.opening : "Mở vòng tò mò nhưng vẫn giữ sự thật cảm xúc."
   }));
+}
+
+function copyImprove(line) {
+  const tighter = line
+    .replace("Có những", "Đôi khi,")
+    .replace("không làm ta xấu đi", "không làm ta nhỏ lại")
+    .replace("điều thiếu nhất", "thứ thiếu nhất");
+  const originalWords = getWords(line).length || 1;
+  const newWords = getWords(tighter).length || 1;
+  const clarityLift = tighter !== line ? 12 : 6;
+  const concisionLift = Math.max(0, originalWords - newWords) * 3;
+  return {
+    text: tighter,
+    improvement: Math.min(38, clarityLift + concisionLift)
+  };
 }
 
 function makeScriptBeats(core, platform) {
@@ -253,14 +386,19 @@ function renderWarRoom(core, preset, platform, text) {
 }
 
 function renderAgents() {
-  document.querySelector("#agentCouncil").innerHTML = agents.map(([name, mission, output, fail], index) => `
+  document.querySelector("#agentCouncil").innerHTML = agents.map((agent, index) => `
     <article class="agent-card">
       <div class="agent-index">${String(index + 1).padStart(2, "0")}</div>
-      <h3>${escapeHtml(name)}</h3>
-      <p><strong>Vai trò:</strong> ${escapeHtml(mission)}</p>
-      <p><strong>Output:</strong> ${escapeHtml(output)}</p>
-      <p><strong>Luật sống còn:</strong> ${escapeHtml(fail)}</p>
-      <span>${escapeHtml(index < 3 ? "Chiến lược" : index < 8 ? "Sản xuất" : "Kiểm định")}</span>
+      <h3>${escapeHtml(agent.name)}</h3>
+      <span>${escapeHtml(agent.tier)}</span>
+      <p><strong>Mission:</strong> ${escapeHtml(agent.mission)}</p>
+      <p><strong>Inspiration:</strong> ${escapeHtml(agent.inspiration)}</p>
+      <div class="agent-rules">
+        ${agent.rules.map((rule) => `<em>${escapeHtml(rule)}</em>`).join("")}
+      </div>
+      <p><strong>Output:</strong> ${escapeHtml(agent.output)}</p>
+      <p><strong>Fail nếu:</strong> ${escapeHtml(agent.fail)}</p>
+      <p><strong>Metric:</strong> ${escapeHtml(agent.metric)} + estimated improvement %</p>
     </article>
   `).join("");
 }
@@ -272,6 +410,7 @@ function renderScriptLab(core, platform) {
     <div class="prompt-item">
       <strong>${escapeHtml(item.label)}</strong>
       <p>${escapeHtml(item.hook)}</p>
+      <p><b>Glow Copywriter:</b> ${escapeHtml(copyImprove(item.hook).text)} <span class="improvement">+${copyImprove(item.hook).improvement}% improved</span></p>
       <p>${escapeHtml(item.why)}</p>
     </div>`).join("");
 
