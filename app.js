@@ -7,6 +7,8 @@ const genreSelect = document.querySelector("#genreSelect");
 const targetSelect = document.querySelector("#targetSelect");
 const lengthRange = document.querySelector("#lengthRange");
 const lengthOutput = document.querySelector("#lengthOutput");
+const aiMode = document.querySelector("#aiMode");
+const aiStatus = document.querySelector("#aiStatus");
 
 const sampleStory = `Ngày xưa, ở một ngôi làng nhỏ ven sông, có một cậu bé tên An sống cùng mẹ trong căn nhà cũ. An chỉ có một chiếc áo đã sờn vai, nhưng cậu luôn giữ nó rất sạch.
 
@@ -255,6 +257,41 @@ function escapeHtml(value) {
 
 function renderList(items) {
   return `<ul>${items.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`;
+}
+
+async function checkAiBackend() {
+  try {
+    const response = await fetch("http://127.0.0.1:4173/api/health", { cache: "no-store" });
+    const data = await response.json();
+    if (data.ok && data.hasKey) {
+      aiStatus.textContent = `AI backend đang hoạt động: ${data.model}. Agent sẽ dùng model thật.`;
+      aiStatus.className = "ai-status ok";
+      return true;
+    }
+    aiStatus.textContent = "Backend có chạy nhưng chưa có OPENAI_API_KEY. App sẽ dùng rule engine fallback.";
+    aiStatus.className = "ai-status warn";
+    return false;
+  } catch {
+    aiStatus.textContent = "Chưa kết nối AI backend. Chạy node server.js để bật agent thật.";
+    aiStatus.className = "ai-status warn";
+    return false;
+  }
+}
+
+async function callAiStudio(text, preset, platform) {
+  const response = await fetch("http://127.0.0.1:4173/api/analyze", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({
+      story: text,
+      genre: preset.title,
+      target: platform.title,
+      minutes: Number(lengthRange.value)
+    })
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || "AI backend failed");
+  return data;
 }
 
 function inferCore(text) {
@@ -540,6 +577,84 @@ function renderQa(core, preset, platform) {
     "Đừng cố làm phim lớn. Làm một khoảnh khắc nhỏ nhưng đúng đến mức người xem thấy mình.",
     "Kết thúc phải mở ra reflection, không đóng bằng đạo lý."
   ]);
+}
+
+function renderAiPackage(data, preset, platform, text) {
+  aiStatus.textContent = "AI agents đã phân tích xong bằng model thật. Output là AI-generated và source-grounded.";
+  aiStatus.className = "ai-status ok";
+
+  const evidence = data.evidence || [];
+  const characters = data.characters || [];
+  const props = data.props_places || [];
+  const diagnosis = data.story_diagnosis || {};
+  const viral = data.viral_strategy || {};
+
+  document.querySelector("#storyCore").classList.remove("empty");
+  document.querySelector("#storyCore").innerHTML = `
+    <p><strong>Logline:</strong> ${escapeHtml(diagnosis.logline || "")}</p>
+    <p><strong>Human truth:</strong> ${escapeHtml(diagnosis.human_truth?.text || "")} <em>${escapeHtml((diagnosis.human_truth?.evidence || []).join(", "))}</em></p>
+    <p><strong>Wound:</strong> ${escapeHtml(diagnosis.wound?.text || "")} <em>${escapeHtml((diagnosis.wound?.evidence || []).join(", "))}</em></p>
+    <p><strong>Desire:</strong> ${escapeHtml(diagnosis.desire?.text || "")} <em>${escapeHtml((diagnosis.desire?.evidence || []).join(", "))}</em></p>
+    <p><strong>False belief:</strong> ${escapeHtml(diagnosis.false_belief?.text || "")}</p>
+    <div class="pill-list"><span class="pill">Mode: AI agents</span><span class="pill">${escapeHtml(preset.title)}</span><span class="pill">${escapeHtml(platform.title)}</span></div>`;
+
+  document.querySelector("#viralThesis").classList.remove("empty");
+  document.querySelector("#viralThesis").innerHTML = renderList([viral.thesis, viral.audience_mirror, viral.share_trigger].filter(Boolean));
+  document.querySelector("#retentionCurve").classList.remove("empty");
+  document.querySelector("#retentionCurve").innerHTML = (viral.retention_curve || []).map((item, index) => `<div class="curve-step" style="height:${64 + index * 14}px"><strong>${escapeHtml(item.time || String(index + 1))}</strong><span>${escapeHtml(item.job || item.device || "")}</span></div>`).join("");
+
+  document.querySelector("#characterLock").classList.remove("empty");
+  document.querySelector("#characterLock").innerHTML = characters.map((item) => `<div class="evidence-item"><strong>${escapeHtml(item.name)}</strong><p>${escapeHtml(item.role || "")} | ${escapeHtml((item.evidence || []).join(", "))}</p></div>`).join("") || "<div class='evidence-item'><strong>Không phát hiện</strong><p>AI không khóa được nhân vật rõ.</p></div>";
+
+  document.querySelector("#worldLock").classList.remove("empty");
+  document.querySelector("#worldLock").innerHTML = props.map((item) => `<div class="evidence-item"><strong>${escapeHtml(item.name)}</strong><p>${escapeHtml(item.type || "")} | ${escapeHtml((item.evidence || []).join(", "))}</p></div>`).join("") || "<div class='evidence-item'><strong>Không phát hiện</strong><p>AI không khóa được prop/place rõ.</p></div>";
+
+  document.querySelector("#evidenceLedger").classList.remove("empty");
+  document.querySelector("#evidenceLedger").innerHTML = evidence.map((item) => `<div class="evidence-item"><strong>${escapeHtml(item.id)}</strong><p>${escapeHtml(item.text)}<br>${escapeHtml(item.function || "")}</p></div>`).join("");
+
+  document.querySelector("#approvalList").classList.remove("empty");
+  document.querySelector("#approvalList").innerHTML = (data.creative_additions_for_approval || []).map((item) => `<div class="check-item warn"><strong>${escapeHtml(item.idea || "Đề xuất")}</strong><p>${escapeHtml(item.why || "")} ${escapeHtml(item.risk || "")}</p></div>`).join("") || "<div class='check-item ok'><strong>Không có đề xuất ngoài nguồn</strong><p>AI không yêu cầu thêm chi tiết sáng tạo.</p></div>";
+
+  document.querySelector("#hookLab").classList.remove("empty");
+  document.querySelector("#hookLab").innerHTML = (data.hooks || []).map((item) => `<div class="prompt-item"><strong>${escapeHtml(item.type || "Hook")} | ${escapeHtml((item.evidence || []).join(", "))}</strong><p>${escapeHtml(item.text || "")}</p><p>${escapeHtml(item.why_it_works || "")} <span class="improvement">+${escapeHtml(item.copy_lift_percent || 0)}% improved</span></p></div>`).join("");
+
+  document.querySelector("#scriptDraft").classList.remove("empty");
+  document.querySelector("#scriptDraft").innerHTML = (data.detailed_script || []).map((beat, index) => `<div class="script-row">
+    <div><strong>${index + 1}. ${escapeHtml(beat.beat || "")}</strong><span>${escapeHtml(beat.time || "")} | ${escapeHtml((beat.source_evidence || []).join(", "))}</span></div>
+    <p><b>Visual:</b> ${escapeHtml(beat.visual || "")}</p>
+    <p><b>Narration:</b> ${escapeHtml(beat.narration || "")}</p>
+    <p><b>Dialogue:</b> ${escapeHtml(beat.dialogue || "")}</p>
+    <p><b>Sound:</b> ${escapeHtml(beat.sound || "")}</p>
+    <p><b>Retention:</b> ${escapeHtml(beat.retention_job || "")}</p>
+    <p><b>GLOW:</b> ${escapeHtml(beat.glow_check || "")}</p>
+  </div>`).join("");
+
+  document.querySelector("#aiRewriteRoom").classList.remove("empty");
+  document.querySelector("#aiRewriteRoom").innerHTML = (data.critic_notes || []).map((note, index) => `<div class="script-row"><div><strong>Rewrite Note ${index + 1}</strong><span>AI critic</span></div><p>${escapeHtml(note)}</p></div>`).join("");
+
+  document.querySelector("#sceneCount").textContent = `${(data.storyboard || []).length} scene`;
+  document.querySelector("#storyboardList").classList.remove("empty");
+  document.querySelector("#storyboardList").innerHTML = (data.storyboard || []).map((scene) => `<div class="scene-card">
+    <div class="scene-num">Scene ${escapeHtml(scene.scene || "")}<br>${escapeHtml(scene.duration || "")}<br>${escapeHtml((scene.evidence || []).join(", "))}</div>
+    <div><h4>${escapeHtml(scene.action || "")}</h4><p><strong>Emotion:</strong> ${escapeHtml(scene.emotion || "")}</p><p><strong>Transition:</strong> ${escapeHtml(scene.transition || "")}</p></div>
+    <div class="scene-meta"><span><strong>Camera:</strong> ${escapeHtml(scene.camera || "")}</span><span><strong>Sound:</strong> ${escapeHtml(scene.sound_design || "")}</span></div>
+  </div>`).join("");
+
+  document.querySelector("#imagePrompts").classList.remove("empty");
+  document.querySelector("#imagePrompts").innerHTML = (data.image_prompts || []).map((item) => `<div class="prompt-item"><strong>Scene ${escapeHtml(item.scene || "")} | ${escapeHtml((item.evidence || []).join(", "))}</strong><p>${escapeHtml(item.prompt || "")}</p><p><b>Negative:</b> ${escapeHtml(item.negative || "")}</p><p><b>Anchors:</b> ${escapeHtml((item.continuity_anchors || []).join(", "))}</p></div>`).join("");
+
+  document.querySelector("#motionPrompts").classList.remove("empty");
+  document.querySelector("#motionPrompts").innerHTML = (data.motion_prompts || []).map((item) => `<div class="prompt-item"><strong>Scene ${escapeHtml(item.scene || "")} | ${escapeHtml((item.evidence || []).join(", "))}</strong><p>${escapeHtml(item.prompt || "")}</p><p><b>First:</b> ${escapeHtml(item.first_frame || "")}</p><p><b>Last:</b> ${escapeHtml(item.last_frame || "")}</p><p><b>Sound:</b> ${escapeHtml(item.sound || "")}</p></div>`).join("");
+
+  document.querySelector("#continuityList").classList.remove("empty");
+  document.querySelector("#continuityList").innerHTML = (data.qa || []).map((item) => `<div class="check-item ${escapeHtml(item.level || "warn")}"><strong>${escapeHtml(item.title || "")}</strong><p>${escapeHtml(item.note || "")}</p></div>`).join("");
+  document.querySelector("#criticNotes").classList.remove("empty");
+  document.querySelector("#criticNotes").innerHTML = renderList(data.critic_notes || []);
+
+  renderAgents();
+  renderAdaptation(text, preset);
+  renderBible(groundedCore(text), preset);
+  updateScores(text, groundedCore(text));
 }
 
 function updateScores(text, core) {
@@ -968,7 +1083,7 @@ function renderQa(core, preset, platform) {
   ]);
 }
 
-function generatePackage() {
+async function generatePackage() {
   const text = storyInput.value.trim() || sampleStory;
   if (!storyInput.value.trim()) {
     storyInput.value = sampleStory;
@@ -976,6 +1091,20 @@ function generatePackage() {
   }
   const preset = genrePresets[genreSelect.value];
   const platform = platformRules[targetSelect.value];
+
+  if (aiMode.checked) {
+    aiStatus.textContent = "Đang gọi AI agents qua backend...";
+    aiStatus.className = "ai-status";
+    try {
+      const aiResult = await callAiStudio(text, preset, platform);
+      renderAiPackage(aiResult, preset, platform, text);
+      return;
+    } catch (error) {
+      aiStatus.textContent = `AI backend chưa chạy hoặc lỗi: ${error.message}. Đang dùng fallback rule engine.`;
+      aiStatus.className = "ai-status warn";
+    }
+  }
+
   const core = groundedCore(text);
   const scenes = makeGroundedScenes(core, preset, platform, Number(lengthRange.value));
 
@@ -983,6 +1112,8 @@ function generatePackage() {
   renderEvidence(core);
   renderAgents();
   renderScriptLab(core, platform);
+  document.querySelector("#aiRewriteRoom").classList.add("empty");
+  document.querySelector("#aiRewriteRoom").innerHTML = "Fallback rule engine đang chạy. Muốn có AI rewrite thật, hãy bật backend bằng OPENAI_API_KEY.";
   renderAdaptation(text, preset);
   renderBible(core, preset);
   renderStoryboard(scenes);
@@ -990,3 +1121,28 @@ function generatePackage() {
   renderQa(core, preset, platform);
   updateScores(text, core);
 }
+
+document.querySelectorAll(".tab").forEach((tab) => {
+  tab.addEventListener("click", () => {
+    document.querySelectorAll(".tab, .tab-panel").forEach((node) => node.classList.remove("active"));
+    tab.classList.add("active");
+    document.querySelector(`#${tab.dataset.tab}`).classList.add("active");
+  });
+});
+
+storyInput.addEventListener("input", updateWordCount);
+sampleBtn.addEventListener("click", () => {
+  storyInput.value = sampleStory;
+  updateWordCount();
+});
+clearBtn.addEventListener("click", () => {
+  storyInput.value = "";
+  updateWordCount();
+});
+lengthRange.addEventListener("input", () => {
+  lengthOutput.textContent = `${lengthRange.value} phút`;
+});
+generateBtn.addEventListener("click", generatePackage);
+
+updateWordCount();
+checkAiBackend();

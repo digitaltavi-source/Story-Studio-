@@ -20,6 +20,24 @@ Web app hỗ trợ chuyển thể script truyện đọc hoặc transcript audio
 
 Mở `index.html` trực tiếp bằng trình duyệt.
 
+## Chạy với AI thật
+
+Bản HTML mở trực tiếp chỉ chạy rule engine fallback. Muốn các agent gọi model thật:
+
+```powershell
+cd "E:\Video Narrator"
+$env:OPENAI_API_KEY="sk-..."
+node server.js
+```
+
+Sau đó mở:
+
+```text
+http://127.0.0.1:4173
+```
+
+Backend dùng OpenAI Responses API qua `server.js`, giữ API key ở máy local thay vì đưa key vào trình duyệt.
+
 ## Triết lý
 
 App này không chỉ minh họa từng câu chuyện bằng hình ảnh. Nó giữ phần lõi của truyện, dịch trải nghiệm từ chữ sang tai và mắt, rồi nâng cấp thành ngôn ngữ điện ảnh có hook, retention, share trigger và kiểm định GLOW.

@@ -30,6 +30,12 @@
         </section>
 
         <section class="control-panel">
+          <div class="ai-mode-row">
+            <label for="aiMode">AI Studio Mode</label>
+            <input id="aiMode" type="checkbox" checked />
+          </div>
+          <div id="aiStatus" class="ai-status">Chưa kết nối AI backend. Nếu chưa chạy server, app sẽ dùng rule engine fallback.</div>
+
           <label for="genreSelect">DNA thể loại</label>
           <select id="genreSelect">
             <option value="wit">WIT Daily / Healing Story</option>
@@ -144,6 +150,10 @@
             <article class="wide-card">
               <h3>Million-View Script Draft</h3>
               <div id="scriptDraft" class="script-list empty">Bản script có nhịp giữ chân sẽ xuất hiện ở đây.</div>
+            </article>
+            <article class="wide-card">
+              <h3>AI Rewrite Room</h3>
+              <div id="aiRewriteRoom" class="script-list empty">Khi AI backend hoạt động, phần này sẽ chứa bản rewrite nhiều vòng từ các agent.</div>
             </article>
             <article>
               <h3>Share Triggers</h3>
