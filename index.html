@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AI Storytelling Studio</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">AS</div>
+          <div>
+            <h1>AI Storytelling Studio</h1>
+            <p>Chuyển thể script/audio thành film package.</p>
+          </div>
+        </div>
+
+        <section class="input-panel">
+          <div class="panel-heading">
+            <h2>Nguồn truyện</h2>
+            <span id="wordCount">0 từ</span>
+          </div>
+          <textarea id="storyInput" placeholder="Dán script truyện đọc hoặc transcript audio vào đây..."></textarea>
+          <div class="input-actions">
+            <button id="sampleBtn" type="button">Nạp mẫu</button>
+            <button id="clearBtn" type="button">Xóa</button>
+          </div>
+        </section>
+
+        <section class="control-panel">
+          <label for="genreSelect">Thể loại chuyển thể</label>
+          <select id="genreSelect">
+            <option value="children">Truyện thiếu nhi/cổ tích</option>
+            <option value="fable">Truyện ngụ ngôn</option>
+            <option value="inspiration">Truyện truyền cảm hứng</option>
+            <option value="history">Truyện lịch sử/giáo dục</option>
+            <option value="horror">Truyện kinh dị nhẹ</option>
+            <option value="romance">Truyện tình cảm</option>
+          </select>
+
+          <label for="targetSelect">Mục tiêu phát hành</label>
+          <select id="targetSelect">
+            <option value="festival">Festival short film</option>
+            <option value="youtube">YouTube storytelling</option>
+            <option value="education">Lớp học/giáo dục</option>
+            <option value="family">Gia đình/trẻ em</option>
+          </select>
+
+          <label for="lengthRange">Độ dài video mong muốn</label>
+          <div class="range-row">
+            <input id="lengthRange" type="range" min="1" max="10" value="4" />
+            <output id="lengthOutput">4 phút</output>
+          </div>
+
+          <button id="generateBtn" class="primary-action" type="button">Thiết kế chuyển thể</button>
+        </section>
+      </aside>
+
+      <main class="workspace">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Adaptation Engine</p>
+            <h2>Biến sản phẩm dành cho mắt thành trải nghiệm cho tai và mắt</h2>
+          </div>
+          <div class="score-strip">
+            <div>
+              <span id="cinemaScore">--</span>
+              <small>Cinematic</small>
+            </div>
+            <div>
+              <span id="continuityScore">--</span>
+              <small>Continuity</small>
+            </div>
+            <div>
+              <span id="narrationScore">--</span>
+              <small>Narration</small>
+            </div>
+          </div>
+        </header>
+
+        <nav class="tabs" aria-label="Studio views">
+          <button class="tab active" data-tab="story">Story Core</button>
+          <button class="tab" data-tab="glow">GLOW DNA</button>
+          <button class="tab" data-tab="adaptation">Chuyển thể</button>
+          <button class="tab" data-tab="bible">Visual Bible</button>
+          <button class="tab" data-tab="storyboard">Storyboard</button>
+          <button class="tab" data-tab="prompts">Prompt Pack</button>
+          <button class="tab" data-tab="qa">QA</button>
+        </nav>
+
+        <section id="story" class="tab-panel active">
+          <div class="section-grid">
+            <article class="wide-card">
+              <h3>Story Core</h3>
+              <div id="storyCore" class="content-block empty">Chưa có dữ liệu. Hãy dán truyện và bấm “Thiết kế chuyển thể”.</div>
+            </article>
+            <article>
+              <h3>Emotional Arc</h3>
+              <div id="emotionArc" class="arc-chart"></div>
+            </article>
+            <article>
+              <h3>Symbol Tracker</h3>
+              <div id="symbolTracker" class="content-block empty">Biểu tượng trung tâm sẽ xuất hiện ở đây.</div>
+            </article>
+          </div>
+        </section>
+
+        <section id="glow" class="tab-panel">
+          <div class="section-grid">
+            <article class="wide-card">
+              <h3>GLOW DNA Guardrails</h3>
+              <div id="glowPrinciples" class="dna-grid"></div>
+            </article>
+            <article>
+              <h3>WIT Story Check</h3>
+              <div id="witStoryCheck" class="check-list empty">Chưa có phân tích DNA truyện.</div>
+            </article>
+            <article>
+              <h3>WIT Audio Check</h3>
+              <div id="witAudioCheck" class="check-list empty">Chưa có phân tích DNA audio.</div>
+            </article>
+            <article class="wide-card">
+              <h3>GLOW Alignment</h3>
+              <div id="glowAlignment" class="content-block empty">App sẽ kiểm tra sự thật cảm xúc, không áp đặt, không thao túng và continuity linh hồn.</div>
+            </article>
+          </div>
+        </section>
+
+        <section id="adaptation" class="tab-panel">
+          <div class="section-grid">
+            <article class="wide-card">
+              <h3>Narration Surgery</h3>
+              <div id="narrationPlan" class="content-block empty">App sẽ phân loại từng đoạn: giữ kể, rút gọn, chuyển thành hình, đối thoại hoặc silent moment.</div>
+            </article>
+            <article>
+              <h3>Medium Translation</h3>
+              <div id="mediumMap" class="content-block empty">Bản dịch từ chữ sang tai và mắt.</div>
+            </article>
+            <article>
+              <h3>Genre Preset</h3>
+              <div id="genrePreset" class="content-block empty">Luật chuyển thể theo thể loại.</div>
+            </article>
+          </div>
+        </section>
+
+        <section id="bible" class="tab-panel">
+          <div id="visualBible" class="bible-grid"></div>
+        </section>
+
+        <section id="storyboard" class="tab-panel">
+          <div class="timeline-toolbar">
+            <strong>Master Storyboard</strong>
+            <span id="sceneCount">0 scene</span>
+          </div>
+          <div id="storyboardList" class="storyboard-list empty">Storyboard sẽ được tạo theo beat điện ảnh.</div>
+        </section>
+
+        <section id="prompts" class="tab-panel">
+          <div class="prompt-layout">
+            <article>
+              <h3>Image Prompts</h3>
+              <div id="imagePrompts" class="prompt-list empty">Keyframe prompt sẽ xuất hiện ở đây.</div>
+            </article>
+            <article>
+              <h3>Motion Prompts</h3>
+              <div id="motionPrompts" class="prompt-list empty">Video prompt sẽ xuất hiện ở đây.</div>
+            </article>
+          </div>
+        </section>
+
+        <section id="qa" class="tab-panel">
+          <div class="qa-layout">
+            <article>
+              <h3>Continuity Checklist</h3>
+              <div id="continuityList" class="check-list empty">Chưa có checklist.</div>
+            </article>
+            <article>
+              <h3>Festival Quality Critic</h3>
+              <div id="criticNotes" class="content-block empty">Chưa có nhận xét chất lượng.</div>
+            </article>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
