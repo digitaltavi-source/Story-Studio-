@@ -160,7 +160,7 @@ async function generateStory() {
     }
     
     generateBtn.disabled = true;
-    generateBtn.textContent = 'Đang tạo...';
+    generateBtn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Đang tạo...';
     resultArea.classList.add('hidden');
     
     try {
@@ -179,6 +179,8 @@ async function generateStory() {
         if (result.success) {
             outputContent.innerHTML = result.story.replace(/\n/g, '<br>');
             resultArea.classList.remove('hidden');
+            // Scroll to result
+            resultArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
         } else {
             alert('Lỗi: ' + (result.error || 'Không thể tạo câu chuyện'));
         }
@@ -186,7 +188,7 @@ async function generateStory() {
         alert('Lỗi kết nối: ' + error.message);
     } finally {
         generateBtn.disabled = false;
-        generateBtn.textContent = 'Tạo câu chuyện';
+        generateBtn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Tạo câu chuyện';
     }
 }
 
