@@ -1,16 +1,241 @@
-const storyInput = document.querySelector("#storyInput");
-const wordCount = document.querySelector("#wordCount");
-const sampleBtn = document.querySelector("#sampleBtn");
-const clearBtn = document.querySelector("#clearBtn");
-const generateBtn = document.querySelector("#generateBtn");
-const genreSelect = document.querySelector("#genreSelect");
-const targetSelect = document.querySelector("#targetSelect");
-const lengthRange = document.querySelector("#lengthRange");
-const lengthOutput = document.querySelector("#lengthOutput");
-const aiMode = document.querySelector("#aiMode");
-const aiStatus = document.querySelector("#aiStatus");
+// GLOW Story Studio - Main Application
+// Refactored for modularity and maintainability
 
-const sampleStory = `Ngày xưa, ở một ngôi làng nhỏ ven sông, có một cậu bé tên An sống cùng mẹ trong căn nhà cũ. An chỉ có một chiếc áo đã sờn vai, nhưng cậu luôn giữ nó rất sạch.
+(function() {
+  'use strict';
+
+  // ============================================================================
+  // CONFIGURATION & CONSTANTS
+  // ============================================================================
+  
+  const CONFIG = {
+    AI_BACKEND_URL: 'http://127.0.0.1:4173',
+    DEFAULT_GENRE: 'wit',
+    DEFAULT_PLATFORM: 'shorts',
+    DEFAULT_DURATION: 1,
+    MAX_WORD_COUNT: 5000
+  };
+
+  const GENRE_PRESETS = {
+    wit: {
+      title: "WIT Daily / Healing Story",
+      promise: "Người xem thấy mình trong một khoảnh khắc đời thường và lặng đi vài giây.",
+      narration: "18-28% narration. Giọng kể là người chứng kiến, không dạy đời.",
+      style: "quiet human cinema, honest faces, lived-in details, soft natural light",
+      palette: ["#F9E6D0", "#A1C7E0", "#FFB7B2", "#FFFFFF"],
+      music: "piano rất mỏng, room tone, foley nhỏ, khoảng lặng có chủ đích"
+    },
+    children: {
+      title: "Thiếu nhi / cổ tích",
+      promise: "Trẻ hiểu bằng hình ảnh rõ, người lớn cảm bằng tầng nghĩa mềm.",
+      narration: "25-35% narration. Lời kể ngắn, sáng, không lên lớp.",
+      style: "premium storybook cinema, warm light, expressive faces, clean composition",
+      palette: ["#F8B84E", "#6BBF8A", "#4F7CAC", "#F6EFE3"],
+      music: "piano nhẹ, woodwind mềm, foley đời thường"
+    },
+    fable: {
+      title: "Ngụ ngôn / bài học mềm",
+      promise: "Bài học được khán giả tự nhận ra qua setup/payoff.",
+      narration: "28-38% narration. Giữ chất kể, tránh kết luận trực diện.",
+      style: "timeless fable, symbolic staging, balanced theatrical framing",
+      palette: ["#C78C3B", "#315F4B", "#B8C2A1", "#F7F0DF"],
+      music: "nhạc cụ mộc, nhấn nhẹ ở khoảnh khắc nhận ra"
+    },
+    inspiration: {
+      title: "Truyền cảm hứng",
+      promise: "Từ vết nứt nhỏ đi tới một lựa chọn khiến người xem muốn đứng dậy.",
+      narration: "20-30% narration. Đẩy montage và visual metaphor.",
+      style: "premium inspirational short film, intimate close-ups, hopeful lighting",
+      palette: ["#1F4F5F", "#F2A541", "#E6E1D6", "#8FB8A8"],
+      music: "strings tối giản, build chậm, không ép cao trào"
+    },
+    history: {
+      title: "Lịch sử / giáo dục",
+      promise: "Thông tin chính xác nhưng vẫn có con người, lựa chọn và cái giá.",
+      narration: "40-55% narration. Bảo toàn bối cảnh và sự kiện.",
+      style: "historical cinematic realism, authentic costumes, textured environments",
+      palette: ["#5B4636", "#9A7B4F", "#2F5D62", "#DDD0B7"],
+      music: "ambient lịch sử, nhạc cụ vùng miền nếu có căn cứ"
+    },
+    horror: {
+      title: "Kinh dị nhẹ",
+      promise: "Sợ vì sự im lặng và điều chưa nói, không vì jumpscare rẻ.",
+      narration: "15-25% narration. Để không khí tự kể.",
+      style: "soft suspense cinema, narrow framing, practical shadows, restrained reveals",
+      palette: ["#202124", "#5E6B64", "#9B7B52", "#D4D0C8"],
+      music: "drone thấp, tiếng phòng, tiếng gió, nhịp thưa"
+    },
+    romance: {
+      title: "Tình cảm",
+      promise: "Micro emotion và khoảng dừng làm người xem nhớ một người.",
+      narration: "20-30% narration. Ưu tiên ánh mắt, tay, silence và dialogue ít.",
+      style: "intimate romantic drama, soft daylight, subtle gestures, gentle camera",
+      palette: ["#A95C68", "#F0C7A9", "#596F62", "#F8F3ED"],
+      music: "guitar/piano mềm, silence ở điểm cảm xúc"
+    }
+  };
+
+  const PLATFORM_RULES = {
+    shorts: {
+      title: "Shorts / Reels / TikTok",
+      opening: "0-2 giây phải có hình ảnh nghịch lý hoặc câu hỏi nội tâm.",
+      retention: ["0s pattern interrupt", "3s context lock", "8s emotional turn", "18s reveal", "last 3s share line"],
+      scriptUnit: "45-75 giây, mỗi câu thoại/narration dưới 11 từ."
+    },
+    youtube: {
+      title: "YouTube 3-8 phút",
+      opening: "15 giây đầu đặt lời hứa cảm xúc và một câu hỏi chưa trả lời.",
+      retention: ["0:00 cold open", "0:15 premise", "1:00 first turn", "2:30 low point", "4:00 meaning shift", "end callback"],
+      scriptUnit: "3-8 phút, mỗi 30-45 giây phải có một emotional beat."
+    },
+    festival: {
+      title: "Festival short film",
+      opening: "Mở bằng visual question, ít lời, biểu tượng mạnh.",
+      retention: ["opening image", "silent setup", "pressure", "choice", "visual payoff"],
+      scriptUnit: "Ít narration, nhiều hành động, motif và khoảng lặng."
+    },
+    education: {
+      title: "Giáo dục / lớp học",
+      opening: "Mở bằng tình huống quen thuộc để người học tự liên hệ.",
+      retention: ["question", "case", "conflict", "insight", "reflection prompt"],
+      scriptUnit: "Rõ thông tin, nhưng vẫn cần nhân vật và lựa chọn."
+    }
+  };
+
+  const AGENT_DEFINITIONS = [
+    {
+      name: "Story Truth Analyst",
+      tier: "Chiến lược",
+      mission: "Tìm sự thật con người ẩn dưới cốt truyện.",
+      inspiration: "WIT Daily DNA, Pixar story spine, Robert McKee, GLOW Soul Manifesto.",
+      rules: ["Theme phải đến từ lựa chọn, không từ lời giảng.", "Nhân vật phải có wound, desire, false belief.", "Nếu câu chuyện chưa có sự thật con người, yêu cầu làm rõ trước khi viết."],
+      output: "Human truth, emotional wound, desire, false belief, symbol, transformation seed.",
+      fail: "Không tìm được điều khiến người xem thấy mình trong câu chuyện.",
+      metric: "Truth lift"
+    },
+    {
+      name: "Audience Psychologist",
+      tier: "Chiến lược",
+      mission: "Xác định vì sao người xem dừng lại, xem tiếp, bình luận và chia sẻ.",
+      inspiration: "Behavioral storytelling, audience empathy mapping, ethical retention design.",
+      rules: ["Không tối ưu view bằng sợ hãi rẻ hoặc thao túng.", "Mỗi insight phải nối với một cảm xúc phổ quát.", "Luôn tách audience pain khỏi platform trick."],
+      output: "Audience mirror, pain point, share motive, comment motive, retention risk.",
+      fail: "Chỉ nói chung chung 'cảm động' mà không chỉ ra ai sẽ cảm và vì sao.",
+      metric: "Mirror score"
+    },
+    {
+      name: "Viral Hook Architect",
+      tier: "Chiến lược",
+      mission: "Thiết kế 3 giây đầu có lực kéo nhưng không clickbait.",
+      inspiration: "Gary Halbert, Joe Sugarman, Maria Veloso, Claude Hopkins, modern short-form retention.",
+      rules: ["Hook phải mở một vòng tò mò thật.", "Không hứa điều video không trả.", "Ưu tiên hình ảnh nghịch lý hơn câu chữ phô trương."],
+      output: "Visual hook, psychological hook, share hook, first-frame brief, A/B variants.",
+      fail: "Hook gây tò mò nhưng phản bội tinh thần câu chuyện.",
+      metric: "Hook lift"
+    },
+    {
+      name: "Glow Copywriter",
+      tier: "Chiến lược",
+      mission: "Tối ưu mọi câu chữ để rõ, chạm, ngắn, tự nhiên và có sức chuyển hóa.",
+      inspiration: "Maria Veloso, Joe Sugarman, Gary Halbert, Claude Hopkins, WIT Audio restraint.",
+      rules: ["Giữ giọng của người viết, không bóp méo ý định gốc.", "Loại fluff, giữ precision và emotional clarity.", "Nếu input mơ hồ, phải yêu cầu làm rõ trước khi tối ưu.", "Luôn ước tính phần trăm cải thiện ở cuối bản tối ưu."],
+      output: "Optimized hook, narration, CTA, caption, title, improvement percentage.",
+      fail: "Câu chữ nghe quảng cáo, quá bóng bẩy hoặc mất sự thật.",
+      metric: "Copy lift"
+    },
+    {
+      name: "Screenwriter",
+      tier: "Sản xuất",
+      mission: "Chuyển story truth thành script có beat, hành động, silence và payoff.",
+      inspiration: "Pixar shorts, Disney emotional clarity, cinematic dramatic writing.",
+      rules: ["Mỗi beat phải đổi trạng thái cảm xúc.", "Đối thoại chỉ dùng khi hình ảnh không nói tốt hơn.", "Kết thúc mở reflection, không đóng bằng đạo lý."],
+      output: "Beat sheet, dialogue, narration, silent moments, visual payoff.",
+      fail: "Script chỉ kể lại truyện thay vì tái thiết kế trải nghiệm.",
+      metric: "Drama lift"
+    },
+    {
+      name: "Narration Surgeon",
+      tier: "Sản xuất",
+      mission: "Cắt lời kể dư và chuyển chữ thành hình ảnh, âm thanh, hành động.",
+      inspiration: "Show-don't-tell editing, WIT Audio remove-before-add doctrine.",
+      rules: ["Không kể thứ camera đã cho thấy.", "Triết lý phải biến thành lựa chọn hoặc callback.", "Giữ narration như nhịp thở, không như bài giảng."],
+      output: "Keep, cut, compress, image, dialogue, reaction, silence map.",
+      fail: "Video vẫn giống audiobook có hình minh họa.",
+      metric: "Narration reduction"
+    },
+    {
+      name: "Cinematic Director",
+      tier: "Sản xuất",
+      mission: "Biến script thành ngôn ngữ điện ảnh có camera, blocking và rhythm.",
+      inspiration: "Pixar visual storytelling, live-action short film grammar, visual poetry.",
+      rules: ["Camera move phải có lý do cảm xúc.", "Reaction shot quan trọng ngang action shot.", "Mỗi transition phải giữ nghĩa, không chỉ đẹp."],
+      output: "Shot intention, lens, camera motion, blocking, transition, rhythm notes.",
+      fail: "Cảnh đẹp nhưng không làm cảm xúc tiến thêm.",
+      metric: "Cinematic lift"
+    },
+    {
+      name: "Art Director",
+      tier: "Sản xuất",
+      mission: "Xây thế giới, nhân vật, đạo cụ và màu sắc giữ đúng linh hồn.",
+      inspiration: "Production design, character bible, GLOW brand warmth and clarity.",
+      rules: ["Style không được lấn át sự thật.", "Symbol phải đổi nghĩa qua phim.", "Mỗi chi tiết lớn phải có continuity anchor."],
+      output: "Character bible, prop bible, world bible, palette, texture, style guardrails.",
+      fail: "Đẹp nhưng generic, không có ký ức sống thật.",
+      metric: "World lift"
+    },
+    {
+      name: "Sound Director",
+      tier: "Sản xuất",
+      mission: "Thiết kế trải nghiệm cho tai mà không ra lệnh cảm xúc.",
+      inspiration: "WIT Audio manifesto, foley storytelling, restrained score design.",
+      rules: ["Nhạc nâng nền, không nói thay.", "Im lặng là nơi chuyển hóa.", "Nếu nghe thấy kỹ thuật trước sự thật, giảm lớp âm thanh."],
+      output: "Voice direction, room tone, foley, music cue, silence map, mix restraint.",
+      fail: "Âm thanh kéo nước mắt thay vì cho người xem tự chạm.",
+      metric: "Audio truth"
+    },
+    {
+      name: "Image Prompt Engineer",
+      tier: "Sản xuất",
+      mission: "Tạo keyframe prompts nhất quán, có cinematic taste và continuity.",
+      inspiration: "AI image production bibles, visual continuity, lens/composition grammar.",
+      rules: ["Prompt phải có subject, environment, light, lens, emotion, style.", "Mỗi nhân vật/đạo cụ cần anchor cố định.", "Không viết prompt trang trí rỗng."],
+      output: "Keyframe prompt pack, negative prompt, reference anchors, style tokens.",
+      fail: "Ảnh đẹp nhưng nhân vật/đạo cụ trôi qua từng cảnh.",
+      metric: "Keyframe consistency"
+    },
+    {
+      name: "Motion Prompt Engineer",
+      tier: "Sản xuất",
+      mission: "Tạo video prompt có chuyển động thật: nhân vật, camera, môi trường, cảm xúc.",
+      inspiration: "Veo/Runway/Kling prompt craft, animation blocking, shot continuity.",
+      rules: ["Không chỉ mô tả hành động bề mặt.", "Luôn có emotional change trong 8 giây.", "Secondary motion và environment motion phải hỗ trợ cảm xúc."],
+      output: "8-second clip prompts, first/last frame notes, motion layers, sound cue.",
+      fail: "Prompt chỉ viết 'nhân vật chạy/cười/khóc' mà không có động cơ.",
+      metric: "Motion clarity"
+    },
+    {
+      name: "Continuity Supervisor",
+      tier: "Kiểm định",
+      mission: "Chống drift nhân vật, đạo cụ, thời gian, ánh sáng, cảm xúc.",
+      inspiration: "Film continuity, AI video drift prevention, production QA.",
+      rules: ["Mỗi clip phải có state before/after.", "Costume, prop, weather, time phải nối logic.", "Cảm xúc không được nhảy cóc."],
+      output: "Continuity checklist, risk flags, fix notes, reference requirements.",
+      fail: "Video mất niềm tin vì mặt, đồ, thời gian hoặc cảm xúc bị trôi.",
+      metric: "Continuity score"
+    },
+    {
+      name: "Festival Quality Critic",
+      tier: "Kiểm định",
+      mission: "Soát tác phẩm theo tiêu chuẩn quốc tế: restraint, originality, clarity, impact.",
+      inspiration: "Festival shorts, Pixar taste, GLOW ethics, human-centered criticism.",
+      rules: ["Nói thẳng điểm yếu, không tâng bốc.", "Nếu quá lộ bài học, trả về rewrite.", "Tìm một chi tiết có thể làm phim đáng nhớ hơn."],
+      output: "Creative diagnosis, rewrite priority, taste notes, improvement percentage.",
+      fail: "Bản dựng đúng quy trình nhưng không chạm.",
+      metric: "Festival lift"
+    }
+  ];
+
+  const SAMPLE_STORY = `Ngày xưa, ở một ngôi làng nhỏ ven sông, có một cậu bé tên An sống cùng mẹ trong căn nhà cũ. An chỉ có một chiếc áo đã sờn vai, nhưng cậu luôn giữ nó rất sạch.
 
 Một ngày nọ, thầy giáo nói rằng lớp sẽ có buổi biểu diễn cuối năm. Ai cũng háo hức chuẩn bị quần áo đẹp. An lặng lẽ nhìn chiếc áo cũ của mình rồi cúi đầu.
 
@@ -20,279 +245,127 @@ Trong buổi biểu diễn, An bước lên sân khấu. Ban đầu cậu run r�
 
 Từ hôm ấy, An hiểu rằng giá trị không nằm ở thứ ta mặc bên ngoài, mà ở điều ta tạo ra bằng lòng biết ơn và can đảm.`;
 
-const genrePresets = {
-  wit: {
-    title: "WIT Daily / Healing Story",
-    promise: "Người xem thấy mình trong một khoảnh khắc đời thường và lặng đi vài giây.",
-    narration: "18-28% narration. Giọng kể là người chứng kiến, không dạy đời.",
-    style: "quiet human cinema, honest faces, lived-in details, soft natural light",
-    palette: ["#F9E6D0", "#A1C7E0", "#FFB7B2", "#FFFFFF"],
-    music: "piano rất mỏng, room tone, foley nhỏ, khoảng lặng có chủ đích"
-  },
-  children: {
-    title: "Thiếu nhi / cổ tích",
-    promise: "Trẻ hiểu bằng hình ảnh rõ, người lớn cảm bằng tầng nghĩa mềm.",
-    narration: "25-35% narration. Lời kể ngắn, sáng, không lên lớp.",
-    style: "premium storybook cinema, warm light, expressive faces, clean composition",
-    palette: ["#F8B84E", "#6BBF8A", "#4F7CAC", "#F6EFE3"],
-    music: "piano nhẹ, woodwind mềm, foley đời thường"
-  },
-  fable: {
-    title: "Ngụ ngôn / bài học mềm",
-    promise: "Bài học được khán giả tự nhận ra qua setup/payoff.",
-    narration: "28-38% narration. Giữ chất kể, tránh kết luận trực diện.",
-    style: "timeless fable, symbolic staging, balanced theatrical framing",
-    palette: ["#C78C3B", "#315F4B", "#B8C2A1", "#F7F0DF"],
-    music: "nhạc cụ mộc, nhấn nhẹ ở khoảnh khắc nhận ra"
-  },
-  inspiration: {
-    title: "Truyền cảm hứng",
-    promise: "Từ vết nứt nhỏ đi tới một lựa chọn khiến người xem muốn đứng dậy.",
-    narration: "20-30% narration. Đẩy montage và visual metaphor.",
-    style: "premium inspirational short film, intimate close-ups, hopeful lighting",
-    palette: ["#1F4F5F", "#F2A541", "#E6E1D6", "#8FB8A8"],
-    music: "strings tối giản, build chậm, không ép cao trào"
-  },
-  history: {
-    title: "Lịch sử / giáo dục",
-    promise: "Thông tin chính xác nhưng vẫn có con người, lựa chọn và cái giá.",
-    narration: "40-55% narration. Bảo toàn bối cảnh và sự kiện.",
-    style: "historical cinematic realism, authentic costumes, textured environments",
-    palette: ["#5B4636", "#9A7B4F", "#2F5D62", "#DDD0B7"],
-    music: "ambient lịch sử, nhạc cụ vùng miền nếu có căn cứ"
-  },
-  horror: {
-    title: "Kinh dị nhẹ",
-    promise: "Sợ vì sự im lặng và điều chưa nói, không vì jumpscare rẻ.",
-    narration: "15-25% narration. Để không khí tự kể.",
-    style: "soft suspense cinema, narrow framing, practical shadows, restrained reveals",
-    palette: ["#202124", "#5E6B64", "#9B7B52", "#D4D0C8"],
-    music: "drone thấp, tiếng phòng, tiếng gió, nhịp thưa"
-  },
-  romance: {
-    title: "Tình cảm",
-    promise: "Micro emotion và khoảng dừng làm người xem nhớ một người.",
-    narration: "20-30% narration. Ưu tiên ánh mắt, tay, silence và dialogue ít.",
-    style: "intimate romantic drama, soft daylight, subtle gestures, gentle camera",
-    palette: ["#A95C68", "#F0C7A9", "#596F62", "#F8F3ED"],
-    music: "guitar/piano mềm, silence ở điểm cảm xúc"
+  // ============================================================================
+  // DOM ELEMENT CACHE
+  // ============================================================================
+  
+  const DOM = {};
+
+  function cacheDOMElements() {
+    DOM.storyInput = document.querySelector("#storyInput");
+    DOM.wordCount = document.querySelector("#wordCount");
+    DOM.sampleBtn = document.querySelector("#sampleBtn");
+    DOM.clearBtn = document.querySelector("#clearBtn");
+    DOM.generateBtn = document.querySelector("#generateBtn");
+    DOM.genreSelect = document.querySelector("#genreSelect");
+    DOM.targetSelect = document.querySelector("#targetSelect");
+    DOM.lengthRange = document.querySelector("#lengthRange");
+    DOM.lengthOutput = document.querySelector("#lengthOutput");
+    DOM.aiMode = document.querySelector("#aiMode");
+    DOM.aiStatus = document.querySelector("#aiStatus");
+    
+    // Output containers
+    DOM.storyCore = document.querySelector("#storyCore");
+    DOM.viralThesis = document.querySelector("#viralThesis");
+    DOM.retentionCurve = document.querySelector("#retentionCurve");
+    DOM.glowAlignment = document.querySelector("#glowAlignment");
+    DOM.agentCouncil = document.querySelector("#agentCouncil");
+    DOM.hookLab = document.querySelector("#hookLab");
+    DOM.scriptDraft = document.querySelector("#scriptDraft");
+    DOM.shareTriggers = document.querySelector("#shareTriggers");
+    DOM.commentPrompts = document.querySelector("#commentPrompts");
+    DOM.narrationPlan = document.querySelector("#narrationPlan");
+    DOM.mediumMap = document.querySelector("#mediumMap");
+    DOM.genrePreset = document.querySelector("#genrePreset");
+    DOM.visualBible = document.querySelector("#visualBible");
+    DOM.characterLock = document.querySelector("#characterLock");
+    DOM.worldLock = document.querySelector("#worldLock");
+    DOM.evidenceLedger = document.querySelector("#evidenceLedger");
+    DOM.approvalList = document.querySelector("#approvalList");
+    DOM.sceneCount = document.querySelector("#sceneCount");
+    DOM.storyboardList = document.querySelector("#storyboardList");
+    DOM.imagePrompts = document.querySelector("#imagePrompts");
+    DOM.motionPrompts = document.querySelector("#motionPrompts");
+    DOM.continuityList = document.querySelector("#continuityList");
+    DOM.criticNotes = document.querySelector("#criticNotes");
+    DOM.aiRewriteRoom = document.querySelector("#aiRewriteRoom");
+    
+    // Score elements
+    DOM.hookScore = document.querySelector("#hookScore");
+    DOM.emotionScore = document.querySelector("#emotionScore");
+    DOM.viralScore = document.querySelector("#viralScore");
+    DOM.glowScore = document.querySelector("#glowScore");
   }
-};
 
-const platformRules = {
-  shorts: {
-    title: "Shorts / Reels / TikTok",
-    opening: "0-2 giây phải có hình ảnh nghịch lý hoặc câu hỏi nội tâm.",
-    retention: ["0s pattern interrupt", "3s context lock", "8s emotional turn", "18s reveal", "last 3s share line"],
-    scriptUnit: "45-75 giây, mỗi câu thoại/narration dưới 11 từ."
-  },
-  youtube: {
-    title: "YouTube 3-8 phút",
-    opening: "15 giây đầu đặt lời hứa cảm xúc và một câu hỏi chưa trả lời.",
-    retention: ["0:00 cold open", "0:15 premise", "1:00 first turn", "2:30 low point", "4:00 meaning shift", "end callback"],
-    scriptUnit: "3-8 phút, mỗi 30-45 giây phải có một emotional beat."
-  },
-  festival: {
-    title: "Festival short film",
-    opening: "Mở bằng visual question, ít lời, biểu tượng mạnh.",
-    retention: ["opening image", "silent setup", "pressure", "choice", "visual payoff"],
-    scriptUnit: "Ít narration, nhiều hành động, motif và khoảng lặng."
-  },
-  education: {
-    title: "Giáo dục / lớp học",
-    opening: "Mở bằng tình huống quen thuộc để người học tự liên hệ.",
-    retention: ["question", "case", "conflict", "insight", "reflection prompt"],
-    scriptUnit: "Rõ thông tin, nhưng vẫn cần nhân vật và lựa chọn."
+  // ============================================================================
+  // UTILITY FUNCTIONS
+  // ============================================================================
+  
+  function getWords(text) {
+    return text.trim().split(/\s+/).filter(Boolean);
   }
-};
 
-const agents = [
-  {
-    name: "Story Truth Analyst",
-    tier: "Chiến lược",
-    mission: "Tìm sự thật con người ẩn dưới cốt truyện.",
-    inspiration: "WIT Daily DNA, Pixar story spine, Robert McKee, GLOW Soul Manifesto.",
-    rules: ["Theme phải đến từ lựa chọn, không từ lời giảng.", "Nhân vật phải có wound, desire, false belief.", "Nếu câu chuyện chưa có sự thật con người, yêu cầu làm rõ trước khi viết."],
-    output: "Human truth, emotional wound, desire, false belief, symbol, transformation seed.",
-    fail: "Không tìm được điều khiến người xem thấy mình trong câu chuyện.",
-    metric: "Truth lift"
-  },
-  {
-    name: "Audience Psychologist",
-    tier: "Chiến lược",
-    mission: "Xác định vì sao người xem dừng lại, xem tiếp, bình luận và chia sẻ.",
-    inspiration: "Behavioral storytelling, audience empathy mapping, ethical retention design.",
-    rules: ["Không tối ưu view bằng sợ hãi rẻ hoặc thao túng.", "Mỗi insight phải nối với một cảm xúc phổ quát.", "Luôn tách audience pain khỏi platform trick."],
-    output: "Audience mirror, pain point, share motive, comment motive, retention risk.",
-    fail: "Chỉ nói chung chung 'cảm động' mà không chỉ ra ai sẽ cảm và vì sao.",
-    metric: "Mirror score"
-  },
-  {
-    name: "Viral Hook Architect",
-    tier: "Chiến lược",
-    mission: "Thiết kế 3 giây đầu có lực kéo nhưng không clickbait.",
-    inspiration: "Gary Halbert, Joe Sugarman, Maria Veloso, Claude Hopkins, modern short-form retention.",
-    rules: ["Hook phải mở một vòng tò mò thật.", "Không hứa điều video không trả.", "Ưu tiên hình ảnh nghịch lý hơn câu chữ phô trương."],
-    output: "Visual hook, psychological hook, share hook, first-frame brief, A/B variants.",
-    fail: "Hook gây tò mò nhưng phản bội tinh thần câu chuyện.",
-    metric: "Hook lift"
-  },
-  {
-    name: "Glow Copywriter",
-    tier: "Chiến lược",
-    mission: "Tối ưu mọi câu chữ để rõ, chạm, ngắn, tự nhiên và có sức chuyển hóa.",
-    inspiration: "Maria Veloso, Joe Sugarman, Gary Halbert, Claude Hopkins, WIT Audio restraint.",
-    rules: ["Giữ giọng của người viết, không bóp méo ý định gốc.", "Loại fluff, giữ precision và emotional clarity.", "Nếu input mơ hồ, phải yêu cầu làm rõ trước khi tối ưu.", "Luôn ước tính phần trăm cải thiện ở cuối bản tối ưu."],
-    output: "Optimized hook, narration, CTA, caption, title, improvement percentage.",
-    fail: "Câu chữ nghe quảng cáo, quá bóng bẩy hoặc mất sự thật.",
-    metric: "Copy lift"
-  },
-  {
-    name: "Screenwriter",
-    tier: "Sản xuất",
-    mission: "Chuyển story truth thành script có beat, hành động, silence và payoff.",
-    inspiration: "Pixar shorts, Disney emotional clarity, cinematic dramatic writing.",
-    rules: ["Mỗi beat phải đổi trạng thái cảm xúc.", "Đối thoại chỉ dùng khi hình ảnh không nói tốt hơn.", "Kết thúc mở reflection, không đóng bằng đạo lý."],
-    output: "Beat sheet, dialogue, narration, silent moments, visual payoff.",
-    fail: "Script chỉ kể lại truyện thay vì tái thiết kế trải nghiệm.",
-    metric: "Drama lift"
-  },
-  {
-    name: "Narration Surgeon",
-    tier: "Sản xuất",
-    mission: "Cắt lời kể dư và chuyển chữ thành hình ảnh, âm thanh, hành động.",
-    inspiration: "Show-don't-tell editing, WIT Audio remove-before-add doctrine.",
-    rules: ["Không kể thứ camera đã cho thấy.", "Triết lý phải biến thành lựa chọn hoặc callback.", "Giữ narration như nhịp thở, không như bài giảng."],
-    output: "Keep, cut, compress, image, dialogue, reaction, silence map.",
-    fail: "Video vẫn giống audiobook có hình minh họa.",
-    metric: "Narration reduction"
-  },
-  {
-    name: "Cinematic Director",
-    tier: "Sản xuất",
-    mission: "Biến script thành ngôn ngữ điện ảnh có camera, blocking và rhythm.",
-    inspiration: "Pixar visual storytelling, live-action short film grammar, visual poetry.",
-    rules: ["Camera move phải có lý do cảm xúc.", "Reaction shot quan trọng ngang action shot.", "Mỗi transition phải giữ nghĩa, không chỉ đẹp."],
-    output: "Shot intention, lens, camera motion, blocking, transition, rhythm notes.",
-    fail: "Cảnh đẹp nhưng không làm cảm xúc tiến thêm.",
-    metric: "Cinematic lift"
-  },
-  {
-    name: "Art Director",
-    tier: "Sản xuất",
-    mission: "Xây thế giới, nhân vật, đạo cụ và màu sắc giữ đúng linh hồn.",
-    inspiration: "Production design, character bible, GLOW brand warmth and clarity.",
-    rules: ["Style không được lấn át sự thật.", "Symbol phải đổi nghĩa qua phim.", "Mỗi chi tiết lớn phải có continuity anchor."],
-    output: "Character bible, prop bible, world bible, palette, texture, style guardrails.",
-    fail: "Đẹp nhưng generic, không có ký ức sống thật.",
-    metric: "World lift"
-  },
-  {
-    name: "Sound Director",
-    tier: "Sản xuất",
-    mission: "Thiết kế trải nghiệm cho tai mà không ra lệnh cảm xúc.",
-    inspiration: "WIT Audio manifesto, foley storytelling, restrained score design.",
-    rules: ["Nhạc nâng nền, không nói thay.", "Im lặng là nơi chuyển hóa.", "Nếu nghe thấy kỹ thuật trước sự thật, giảm lớp âm thanh."],
-    output: "Voice direction, room tone, foley, music cue, silence map, mix restraint.",
-    fail: "Âm thanh kéo nước mắt thay vì cho người xem tự chạm.",
-    metric: "Audio truth"
-  },
-  {
-    name: "Image Prompt Engineer",
-    tier: "Sản xuất",
-    mission: "Tạo keyframe prompts nhất quán, có cinematic taste và continuity.",
-    inspiration: "AI image production bibles, visual continuity, lens/composition grammar.",
-    rules: ["Prompt phải có subject, environment, light, lens, emotion, style.", "Mỗi nhân vật/đạo cụ cần anchor cố định.", "Không viết prompt trang trí rỗng."],
-    output: "Keyframe prompt pack, negative prompt, reference anchors, style tokens.",
-    fail: "Ảnh đẹp nhưng nhân vật/đạo cụ trôi qua từng cảnh.",
-    metric: "Keyframe consistency"
-  },
-  {
-    name: "Motion Prompt Engineer",
-    tier: "Sản xuất",
-    mission: "Tạo video prompt có chuyển động thật: nhân vật, camera, môi trường, cảm xúc.",
-    inspiration: "Veo/Runway/Kling prompt craft, animation blocking, shot continuity.",
-    rules: ["Không chỉ mô tả hành động bề mặt.", "Luôn có emotional change trong 8 giây.", "Secondary motion và environment motion phải hỗ trợ cảm xúc."],
-    output: "8-second clip prompts, first/last frame notes, motion layers, sound cue.",
-    fail: "Prompt chỉ viết 'nhân vật chạy/cười/khóc' mà không có động cơ.",
-    metric: "Motion clarity"
-  },
-  {
-    name: "Continuity Supervisor",
-    tier: "Kiểm định",
-    mission: "Chống drift nhân vật, đạo cụ, thời gian, ánh sáng, cảm xúc.",
-    inspiration: "Film continuity, AI video drift prevention, production QA.",
-    rules: ["Mỗi clip phải có state before/after.", "Costume, prop, weather, time phải nối logic.", "Cảm xúc không được nhảy cóc."],
-    output: "Continuity checklist, risk flags, fix notes, reference requirements.",
-    fail: "Video mất niềm tin vì mặt, đồ, thời gian hoặc cảm xúc bị trôi.",
-    metric: "Continuity score"
-  },
-  {
-    name: "Festival Quality Critic",
-    tier: "Kiểm định",
-    mission: "Soát tác phẩm theo tiêu chuẩn quốc tế: restraint, originality, clarity, impact.",
-    inspiration: "Festival shorts, Pixar taste, GLOW ethics, human-centered criticism.",
-    rules: ["Nói thẳng điểm yếu, không tâng bốc.", "Nếu quá lộ bài học, trả về rewrite.", "Tìm một chi tiết có thể làm phim đáng nhớ hơn."],
-    output: "Creative diagnosis, rewrite priority, taste notes, improvement percentage.",
-    fail: "Bản dựng đúng quy trình nhưng không chạm.",
-    metric: "Festival lift"
+  function updateWordCount() {
+    DOM.wordCount.textContent = `${getWords(DOM.storyInput.value).length} từ`;
   }
-];
 
-function getWords(text) {
-  return text.trim().split(/\s+/).filter(Boolean);
-}
+  function getSentences(text) {
+    return text.replace(/\n+/g, " ").split(/(?<=[.!?。！？])\s+/).map((s) => s.trim()).filter(Boolean);
+  }
 
-function updateWordCount() {
-  wordCount.textContent = `${getWords(storyInput.value).length} từ`;
-}
+  function escapeHtml(value) {
+    return String(value).replace(/[&<>"']/g, (char) => ({ 
+      "&": "&amp;", 
+      "<": "&lt;", 
+      ">": "&gt;", 
+      '"': "&quot;", 
+      "'": "&#039;" 
+    })[char]);
+  }
 
-function getSentences(text) {
-  return text.replace(/\n+/g, " ").split(/(?<=[.!?。！？])\s+/).map((s) => s.trim()).filter(Boolean);
-}
+  function renderList(items) {
+    if (!items || items.length === 0) return '';
+    return `<ul>${items.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`;
+  }
 
-function escapeHtml(value) {
-  return String(value).replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" })[char]);
-}
-
-function renderList(items) {
-  return `<ul>${items.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`;
-}
-
-async function checkAiBackend() {
-  try {
-    const response = await fetch("http://127.0.0.1:4173/api/health", { cache: "no-store" });
-    const data = await response.json();
-    if (data.ok && data.hasKey) {
-      aiStatus.textContent = `AI backend đang hoạt động: ${data.model}. Agent sẽ dùng model thật.`;
-      aiStatus.className = "ai-status ok";
-      return true;
+  // ============================================================================
+  // AI BACKEND COMMUNICATION
+  // ============================================================================
+  
+  async function checkAiBackend() {
+    try {
+      const response = await fetch(`${CONFIG.AI_BACKEND_URL}/api/health`, { cache: "no-store" });
+      const data = await response.json();
+      if (data.ok && data.hasKey) {
+        DOM.aiStatus.textContent = `AI backend đang hoạt động: ${data.model}. Agent sẽ dùng model thật.`;
+        DOM.aiStatus.className = "ai-status ok";
+        return true;
+      }
+      DOM.aiStatus.textContent = "Backend có chạy nhưng chưa có OPENAI_API_KEY. App sẽ dùng rule engine fallback.";
+      DOM.aiStatus.className = "ai-status warn";
+      return false;
+    } catch {
+      DOM.aiStatus.textContent = "Chưa kết nối AI backend. Chạy node server.js để bật agent thật.";
+      DOM.aiStatus.className = "ai-status warn";
+      return false;
     }
-    aiStatus.textContent = "Backend có chạy nhưng chưa có OPENAI_API_KEY. App sẽ dùng rule engine fallback.";
-    aiStatus.className = "ai-status warn";
-    return false;
-  } catch {
-    aiStatus.textContent = "Chưa kết nối AI backend. Chạy node server.js để bật agent thật.";
-    aiStatus.className = "ai-status warn";
-    return false;
   }
-}
 
-async function callAiStudio(text, preset, platform) {
-  const response = await fetch("http://127.0.0.1:4173/api/analyze", {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({
-      story: text,
-      genre: preset.title,
-      target: platform.title,
-      minutes: Number(lengthRange.value)
-    })
-  });
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.error || "AI backend failed");
-  return data;
-}
+  async function callAiStudio(text, preset, platform) {
+    const response = await fetch(`${CONFIG.AI_BACKEND_URL}/api/analyze`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        story: text,
+        genre: preset.title,
+        target: platform.title,
+        minutes: Number(DOM.lengthRange.value)
+      })
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || "AI backend failed");
+    return data;
+  }
 
 function inferCore(text) {
   const sentences = getSentences(text);
@@ -423,7 +496,7 @@ function renderWarRoom(core, preset, platform, text) {
 }
 
 function renderAgents() {
-  document.querySelector("#agentCouncil").innerHTML = agents.map((agent, index) => `
+  document.querySelector("#agentCouncil").innerHTML = AGENT_DEFINITIONS.map((agent, index) => `
     <article class="agent-card">
       <div class="agent-index">${String(index + 1).padStart(2, "0")}</div>
       <h3>${escapeHtml(agent.name)}</h3>
@@ -580,8 +653,8 @@ function renderQa(core, preset, platform) {
 }
 
 function renderAiPackage(data, preset, platform, text) {
-  aiStatus.textContent = "AI agents đã phân tích xong bằng model thật. Output là AI-generated và source-grounded.";
-  aiStatus.className = "ai-status ok";
+  DOM.aiStatus.textContent = "AI agents đã phân tích xong bằng model thật. Output là AI-generated và source-grounded.";
+  DOM.aiStatus.className = "ai-status ok";
 
   const evidence = data.evidence || [];
   const characters = data.characters || [];
@@ -670,15 +743,15 @@ function updateScores(text, core) {
 }
 
 function generatePackage() {
-  const text = storyInput.value.trim() || sampleStory;
-  if (!storyInput.value.trim()) {
-    storyInput.value = sampleStory;
+  const text = DOM.storyInput.value.trim() || SAMPLE_STORY;
+  if (!DOM.storyInput.value.trim()) {
+    DOM.storyInput.value = SAMPLE_STORY;
     updateWordCount();
   }
-  const preset = genrePresets[genreSelect.value];
-  const platform = platformRules[targetSelect.value];
+  const preset = GENRE_PRESETS[DOM.genreSelect.value];
+  const platform = PLATFORM_RULES[DOM.targetSelect.value];
   const core = inferCore(text);
-  const scenes = makeScenes(core, preset, platform, Number(lengthRange.value));
+  const scenes = makeScenes(core, preset, platform, Number(DOM.lengthRange.value));
 
   renderWarRoom(core, preset, platform, text);
   renderAgents();
@@ -699,19 +772,19 @@ document.querySelectorAll(".tab").forEach((tab) => {
   });
 });
 
-storyInput.addEventListener("input", updateWordCount);
-sampleBtn.addEventListener("click", () => {
-  storyInput.value = sampleStory;
+DOM.storyInput.addEventListener("input", updateWordCount);
+DOM.sampleBtn.addEventListener("click", () => {
+  DOM.storyInput.value = SAMPLE_STORY;
   updateWordCount();
 });
-clearBtn.addEventListener("click", () => {
-  storyInput.value = "";
+DOM.clearBtn.addEventListener("click", () => {
+  DOM.storyInput.value = "";
   updateWordCount();
 });
-lengthRange.addEventListener("input", () => {
-  lengthOutput.textContent = `${lengthRange.value} phút`;
+DOM.lengthRange.addEventListener("input", () => {
+  DOM.lengthOutput.textContent = `${DOM.lengthRange.value} phút`;
 });
-generateBtn.addEventListener("click", generatePackage);
+DOM.generateBtn.addEventListener("click", generatePackage);
 
 updateWordCount();
 
@@ -969,7 +1042,7 @@ function renderScriptLab(core, platform) {
       </div>`;
   }).join("");
 
-  const beats = makeGroundedScript(core, platform, Number(lengthRange.value));
+  const beats = makeGroundedScript(core, platform, Number(DOM.lengthRange.value));
   document.querySelector("#scriptDraft").classList.remove("empty");
   document.querySelector("#scriptDraft").innerHTML = beats.map((beat, index) => `
     <div class="script-row">
@@ -1084,29 +1157,29 @@ function renderQa(core, preset, platform) {
 }
 
 async function generatePackage() {
-  const text = storyInput.value.trim() || sampleStory;
-  if (!storyInput.value.trim()) {
-    storyInput.value = sampleStory;
+  const text = DOM.storyInput.value.trim() || SAMPLE_STORY;
+  if (!DOM.storyInput.value.trim()) {
+    DOM.storyInput.value = SAMPLE_STORY;
     updateWordCount();
   }
-  const preset = genrePresets[genreSelect.value];
-  const platform = platformRules[targetSelect.value];
+  const preset = GENRE_PRESETS[DOM.genreSelect.value];
+  const platform = PLATFORM_RULES[DOM.targetSelect.value];
 
-  if (aiMode.checked) {
-    aiStatus.textContent = "Đang gọi AI agents qua backend...";
-    aiStatus.className = "ai-status";
+  if (DOM.aiMode.checked) {
+    DOM.aiStatus.textContent = "Đang gọi AI agents qua backend...";
+    DOM.aiStatus.className = "ai-status";
     try {
       const aiResult = await callAiStudio(text, preset, platform);
       renderAiPackage(aiResult, preset, platform, text);
       return;
     } catch (error) {
-      aiStatus.textContent = `AI backend chưa chạy hoặc lỗi: ${error.message}. Đang dùng fallback rule engine.`;
-      aiStatus.className = "ai-status warn";
+      DOM.aiStatus.textContent = `AI backend chưa chạy hoặc lỗi: ${error.message}. Đang dùng fallback rule engine.`;
+      DOM.aiStatus.className = "ai-status warn";
     }
   }
 
   const core = groundedCore(text);
-  const scenes = makeGroundedScenes(core, preset, platform, Number(lengthRange.value));
+  const scenes = makeGroundedScenes(core, preset, platform, Number(DOM.lengthRange.value));
 
   renderWarRoom(core, preset, platform, text);
   renderEvidence(core);
@@ -1130,19 +1203,21 @@ document.querySelectorAll(".tab").forEach((tab) => {
   });
 });
 
-storyInput.addEventListener("input", updateWordCount);
-sampleBtn.addEventListener("click", () => {
-  storyInput.value = sampleStory;
+DOM.storyInput.addEventListener("input", updateWordCount);
+DOM.sampleBtn.addEventListener("click", () => {
+  DOM.storyInput.value = SAMPLE_STORY;
   updateWordCount();
 });
-clearBtn.addEventListener("click", () => {
-  storyInput.value = "";
+DOM.clearBtn.addEventListener("click", () => {
+  DOM.storyInput.value = "";
   updateWordCount();
 });
-lengthRange.addEventListener("input", () => {
-  lengthOutput.textContent = `${lengthRange.value} phút`;
+DOM.lengthRange.addEventListener("input", () => {
+  DOM.lengthOutput.textContent = `${DOM.lengthRange.value} phút`;
 });
-generateBtn.addEventListener("click", generatePackage);
+DOM.generateBtn.addEventListener("click", generatePackage);
 
 updateWordCount();
 checkAiBackend();
+
+})(); // End of IIFE
