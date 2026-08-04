@@ -1217,7 +1217,166 @@ DOM.lengthRange.addEventListener("input", () => {
 });
 DOM.generateBtn.addEventListener("click", generatePackage);
 
-updateWordCount();
-checkAiBackend();
+// ============================================================================
+// SETTINGS MODAL LOGIC
+// ============================================================================
+
+function initSettingsModal() {
+  const settingsBtn = document.getElementById('settingsBtn');
+  const settingsModal = document.getElementById('settingsModal');
+  const closeSettingsBtn = document.getElementById('closeSettingsBtn');
+  const toggleBtns = document.querySelectorAll('.toggle-btn');
+  const apiKeySection = document.getElementById('apiKeySection');
+  const jsonSection = document.getElementById('jsonSection');
+  const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+  const testConnectionBtn = document.getElementById('testConnectionBtn');
+  const apiKeyInput = document.getElementById('apiKeyInput');
+  const jsonFileInput = document.getElementById('jsonFileInput');
+  const connectionIndicator = document.getElementById('connectionIndicator');
+  const connectionText = document.getElementById('connectionText');
+
+  // Load saved settings from localStorage
+  function loadSettings() {
+    const savedApiKey = localStorage.getItem('ai_api_key');
+    const savedMode = localStorage.getItem('ai_mode') || 'key';
+    
+    if (savedApiKey) {
+      apiKeyInput.value = savedApiKey;
+    }
+    
+    // Set active toggle button
+    toggleBtns.forEach(btn => {
+      if (btn.dataset.mode === savedMode) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+    
+    // Show/hide sections based on mode
+    if (savedMode === 'json') {
+      apiKeySection.classList.add('hidden');
+      jsonSection.classList.remove('hidden');
+    } else {
+      apiKeySection.classList.remove('hidden');
+      jsonSection.classList.add('hidden');
+    }
+  }
+
+  // Save settings to localStorage
+  function saveSettings() {
+    const currentMode = document.querySelector('.toggle-btn.active').dataset.mode;
+    localStorage.setItem('ai_mode', currentMode);
+    
+    if (currentMode === 'key' && apiKeyInput.value.trim()) {
+      localStorage.setItem('ai_api_key', apiKeyInput.value.trim());
+      updateConnectionStatus(true, 'Đã lưu API Key');
+    } else if (currentMode === 'json' && jsonFileInput.files.length > 0) {
+      const file = jsonFileInput.files[0];
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const jsonContent = JSON.parse(e.target.result);
+          localStorage.setItem('ai_json_config', JSON.stringify(jsonContent));
+          updateConnectionStatus(true, 'Đã lưu file JSON');
+        } catch (err) {
+          updateConnectionStatus(false, 'File JSON không hợp lệ');
+        }
+      };
+      reader.readAsText(file);
+    } else {
+      updateConnectionStatus(false, 'Chưa có cấu hình');
+    }
+  }
+
+  // Update connection status display
+  function updateConnectionStatus(connected, text) {
+    if (connected) {
+      connectionIndicator.className = 'status-dot connected';
+      connectionText.textContent = text;
+    } else {
+      connectionIndicator.className = 'status-dot error';
+      connectionText.textContent = text;
+    }
+  }
+
+  // Test connection to backend
+  async function testConnection() {
+    const apiKey = apiKeyInput.value.trim();
+    const currentMode = document.querySelector('.toggle-btn.active').dataset.mode;
+    
+    if (currentMode === 'key' && !apiKey) {
+      updateConnectionStatus(false, 'Vui lòng nhập API Key');
+      return;
+    }
+    
+    updateConnectionStatus(false, 'Đang kiểm tra...');
+    
+    try {
+      const response = await fetch(`${CONFIG.AI_BACKEND_URL}/api/health`);
+      const data = await response.json();
+      
+      if (data.ok) {
+        updateConnectionStatus(true, `Kết nối OK - ${data.provider.toUpperCase()} (${data.mode})`);
+      } else {
+        updateConnectionStatus(false, 'Backend chưa phản hồi');
+      }
+    } catch (error) {
+      updateConnectionStatus(false, `Lỗi: ${error.message}`);
+    }
+  }
+
+  // Event listeners
+  settingsBtn.addEventListener('click', () => {
+    settingsModal.classList.remove('hidden');
+    loadSettings();
+  });
+
+  closeSettingsBtn.addEventListener('click', () => {
+    settingsModal.classList.add('hidden');
+  });
+
+  settingsModal.addEventListener('click', (e) => {
+    if (e.target === settingsModal) {
+      settingsModal.classList.add('hidden');
+    }
+  });
+
+  toggleBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      toggleBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      const mode = btn.dataset.mode;
+      if (mode === 'json') {
+        apiKeySection.classList.add('hidden');
+        jsonSection.classList.remove('hidden');
+      } else {
+        apiKeySection.classList.remove('hidden');
+        jsonSection.classList.add('hidden');
+      }
+    });
+  });
+
+  saveSettingsBtn.addEventListener('click', saveSettings);
+  testConnectionBtn.addEventListener('click', testConnection);
+  
+  jsonFileInput.addEventListener('change', (e) => {
+    if (e.target.files.length > 0) {
+      document.getElementById('jsonStatus').textContent = `Đã chọn: ${e.target.files[0].name}`;
+    }
+  });
+}
+
+// ============================================================================
+// MAIN INITIALIZATION
+// ============================================================================
+
+document.addEventListener('DOMContentLoaded', () => {
+  cacheDOMElements();
+  initSettingsModal();
+  updateWordCount();
+  checkAiBackend();
+});
 
 })(); // End of IIFE
