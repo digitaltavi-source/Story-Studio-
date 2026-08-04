@@ -1,173 +1,101 @@
 // DOM Elements
 const storyInput = document.getElementById('storyInput');
 const generateBtn = document.getElementById('generateBtn');
-const resultContainer = document.getElementById('resultContainer');
-const storyOutput = document.getElementById('storyOutput');
+const resultArea = document.getElementById('resultArea');
+const outputContent = document.getElementById('outputContent');
 const wordCountEl = document.getElementById('wordCount');
+
+// Settings Modal Elements
 const settingsBtn = document.getElementById('settingsBtn');
 const settingsModal = document.getElementById('settingsModal');
 const closeSettings = document.getElementById('closeSettings');
-const saveSettings = document.getElementById('saveSettings');
+const tabBtns = document.querySelectorAll('.tab-btn');
+const tabContents = document.querySelectorAll('.tab-content');
 const apiKeyInput = document.getElementById('apiKeyInput');
 const jsonFileInput = document.getElementById('jsonFileInput');
-const fileNameDisplay = document.getElementById('fileNameDisplay');
 const testConnectionBtn = document.getElementById('testConnectionBtn');
+const saveSettingsBtn = document.getElementById('saveSettingsBtn');
 const connectionStatus = document.getElementById('connectionStatus');
-const tabBtns = document.querySelectorAll('.tab-btn');
-const apikeyTab = document.getElementById('apikeyTab');
-const jsonTab = document.getElementById('jsonTab');
 
 // State
 let currentConfig = {
     type: 'apikey', // 'apikey' or 'json'
     apiKey: '',
-    jsonData: null,
-    jsonFileName: ''
+    jsonData: null
 };
 
-// Initialize
-document.addEventListener('DOMContentLoaded', () => {
-    loadSettings();
-    updateWordCount();
-    setupEventListeners();
-});
-
-// Event Listeners
-function setupEventListeners() {
-    // Story input
-    storyInput.addEventListener('input', updateWordCount);
-    
-    // Generate button
-    generateBtn.addEventListener('click', generateStory);
-    
-    // Settings modal
-    settingsBtn.addEventListener('click', openSettings);
-    closeSettings.addEventListener('click', closeSettingsModal);
-    settingsModal.addEventListener('click', (e) => {
-        if (e.target === settingsModal) closeSettingsModal();
-    });
-    
-    // Tabs
-    tabBtns.forEach(btn => {
-        btn.addEventListener('click', () => switchTab(btn.dataset.tab));
-    });
-    
-    // JSON file input
-    jsonFileInput.addEventListener('change', handleJsonFile);
-    
-    // Save settings
-    saveSettings.addEventListener('click', saveCurrentSettings);
-    
-    // Test connection
-    testConnectionBtn.addEventListener('click', testConnection);
+// Load saved config from localStorage
+function loadConfig() {
+    const saved = localStorage.getItem('aiConfig');
+    if (saved) {
+        try {
+            currentConfig = JSON.parse(saved);
+            if (currentConfig.type === 'apikey' && currentConfig.apiKey) {
+                apiKeyInput.value = currentConfig.apiKey;
+            }
+            updateConnectionStatus(true);
+        } catch (e) {
+            console.error('Error loading config:', e);
+        }
+    }
 }
 
-// Word Count
+// Save config to localStorage
+function saveConfig() {
+    localStorage.setItem('aiConfig', JSON.stringify(currentConfig));
+}
+
+// Update word count
 function updateWordCount() {
     const text = storyInput.value.trim();
-    const words = text ? text.split(/\s+/).length : 0;
-    wordCountEl.textContent = words;
+    const count = text ? text.split(/\s+/).length : 0;
+    wordCountEl.textContent = count;
 }
 
-// Settings Modal
-function openSettings() {
+// Show/Hide Modal
+function openModal() {
     settingsModal.classList.remove('hidden');
 }
 
-function closeSettingsModal() {
+function closeModal() {
     settingsModal.classList.add('hidden');
 }
 
-function switchTab(tab) {
+// Tab switching
+function switchTab(tabName) {
     tabBtns.forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.tab === tab);
+        btn.classList.toggle('active', btn.dataset.tab === tabName);
     });
-    
-    apikeyTab.classList.toggle('active', tab === 'apikey');
-    jsonTab.classList.toggle('active', tab === 'json');
-    
-    currentConfig.type = tab;
+    tabContents.forEach(content => {
+        content.classList.toggle('active', content.id === `tab-${tabName}`);
+    });
+    currentConfig.type = tabName;
 }
 
-function handleJsonFile(e) {
-    const file = e.target.files[0];
-    if (!file) return;
+// Update connection status UI
+function updateConnectionStatus(connected, error = false) {
+    connectionStatus.classList.remove('connected', 'error');
+    const statusText = connectionStatus.querySelector('.status-text');
     
-    const reader = new FileReader();
-    reader.onload = (event) => {
-        try {
-            const json = JSON.parse(event.target.result);
-            currentConfig.jsonData = json;
-            currentConfig.jsonFileName = file.name;
-            fileNameDisplay.textContent = `✓ Đã tải: ${file.name}`;
-            fileNameDisplay.style.color = 'var(--success-color)';
-        } catch (err) {
-            fileNameDisplay.textContent = '✗ File JSON không hợp lệ';
-            fileNameDisplay.style.color = 'var(--error-color)';
-            currentConfig.jsonData = null;
-        }
-    };
-    reader.readAsText(file);
-}
-
-function loadSettings() {
-    const saved = localStorage.getItem('aiStoryConfig');
-    if (saved) {
-        try {
-            const config = JSON.parse(saved);
-            currentConfig = { ...currentConfig, ...config };
-            
-            if (currentConfig.apiKey) {
-                apiKeyInput.value = currentConfig.apiKey;
-            }
-            
-            if (currentConfig.jsonFileName) {
-                fileNameDisplay.textContent = `✓ Đã tải: ${currentConfig.jsonFileName}`;
-                fileNameDisplay.style.color = 'var(--success-color)';
-            }
-            
-            updateConnectionStatus(currentConfig.apiKey || currentConfig.jsonData ? true : false);
-        } catch (err) {
-            console.error('Error loading settings:', err);
-        }
-    }
-}
-
-function saveCurrentSettings() {
-    if (currentConfig.type === 'apikey') {
-        currentConfig.apiKey = apiKeyInput.value.trim();
-        currentConfig.jsonData = null;
-        currentConfig.jsonFileName = '';
-    } else {
-        // JSON mode - keep existing jsonData
-        if (!currentConfig.jsonData) {
-            alert('Vui lòng tải lên file JSON trước khi lưu');
-            return;
-        }
-        currentConfig.apiKey = '';
-    }
-    
-    localStorage.setItem('aiStoryConfig', JSON.stringify(currentConfig));
-    updateConnectionStatus(currentConfig.apiKey || currentConfig.jsonData ? true : false);
-    closeSettingsModal();
-    alert('Đã lưu cấu hình thành công!');
-}
-
-function updateConnectionStatus(connected) {
     if (connected) {
-        connectionStatus.textContent = 'Đã kết nối';
-        connectionStatus.className = 'status-badge connected';
+        connectionStatus.classList.add('connected');
+        statusText.textContent = 'Đã kết nối';
+    } else if (error) {
+        connectionStatus.classList.add('error');
+        statusText.textContent = 'Kết nối thất bại';
     } else {
-        connectionStatus.textContent = 'Chưa kết nối';
-        connectionStatus.className = 'status-badge disconnected';
+        statusText.textContent = 'Chưa kết nối';
     }
 }
 
+// Test connection
 async function testConnection() {
-    const hasConfig = currentConfig.apiKey || currentConfig.jsonData;
+    const configToSend = currentConfig.type === 'apikey' 
+        ? { type: 'apikey', apiKey: apiKeyInput.value }
+        : { type: 'json', jsonData: currentConfig.jsonData };
     
-    if (!hasConfig) {
-        alert('Vui lòng nhập API Key hoặc tải lên file JSON trước');
+    if (currentConfig.type === 'apikey' && !apiKeyInput.value) {
+        alert('Vui lòng nhập API Key');
         return;
     }
     
@@ -175,14 +103,10 @@ async function testConnection() {
     testConnectionBtn.textContent = 'Đang kiểm tra...';
     
     try {
-        const response = await fetch('/api/test', {
+        const response = await fetch('/api/test-connection', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                type: currentConfig.type,
-                apiKey: currentConfig.apiKey,
-                jsonData: currentConfig.jsonData
-            })
+            body: JSON.stringify(configToSend)
         });
         
         const result = await response.json();
@@ -191,67 +115,119 @@ async function testConnection() {
             updateConnectionStatus(true);
             alert('Kết nối thành công!');
         } else {
-            updateConnectionStatus(false);
+            updateConnectionStatus(false, true);
             alert('Kết nối thất bại: ' + (result.error || 'Lỗi không xác định'));
         }
-    } catch (err) {
-        updateConnectionStatus(false);
-        alert('Không thể kết nối server: ' + err.message);
+    } catch (error) {
+        updateConnectionStatus(false, true);
+        alert('Lỗi kết nối: ' + error.message);
     } finally {
         testConnectionBtn.disabled = false;
         testConnectionBtn.textContent = 'Kiểm tra kết nối';
     }
 }
 
-// Generate Story
+// Save settings
+function handleSaveSettings() {
+    if (currentConfig.type === 'apikey') {
+        const key = apiKeyInput.value.trim();
+        if (!key) {
+            alert('Vui lòng nhập API Key');
+            return;
+        }
+        currentConfig.apiKey = key;
+        currentConfig.jsonData = null;
+    } else {
+        if (!currentConfig.jsonData) {
+            alert('Vui lòng tải lên file JSON');
+            return;
+        }
+        currentConfig.apiKey = '';
+    }
+    
+    saveConfig();
+    updateConnectionStatus(true);
+    closeModal();
+    alert('Đã lưu cấu hình!');
+}
+
+// Generate story
 async function generateStory() {
     const prompt = storyInput.value.trim();
-    
     if (!prompt) {
         alert('Vui lòng nhập ý tưởng câu chuyện');
         return;
     }
     
-    const hasConfig = currentConfig.apiKey || currentConfig.jsonData;
-    if (!hasConfig) {
-        alert('Vui lòng cấu hình API Key hoặc file JSON trong Cài đặt trước khi sử dụng');
-        openSettings();
-        return;
-    }
-    
-    // UI Loading state
-    const btnText = generateBtn.querySelector('span');
-    const spinner = generateBtn.querySelector('.spinner');
-    btnText.textContent = 'Đang tạo...';
-    spinner.classList.remove('hidden');
     generateBtn.disabled = true;
+    generateBtn.textContent = 'Đang tạo...';
+    resultArea.classList.add('hidden');
     
     try {
+        const configToSend = currentConfig.type === 'apikey'
+            ? { type: 'apikey', apiKey: currentConfig.apiKey }
+            : { type: 'json', jsonData: currentConfig.jsonData };
+        
         const response = await fetch('/api/generate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                prompt,
-                type: currentConfig.type,
-                apiKey: currentConfig.apiKey,
-                jsonData: currentConfig.jsonData
-            })
+            body: JSON.stringify({ prompt, config: configToSend })
         });
         
-        const data = await response.json();
+        const result = await response.json();
         
-        if (data.success) {
-            storyOutput.textContent = data.story;
-            resultContainer.classList.remove('hidden');
-            resultContainer.scrollIntoView({ behavior: 'smooth' });
+        if (result.success) {
+            outputContent.innerHTML = result.story.replace(/\n/g, '<br>');
+            resultArea.classList.remove('hidden');
         } else {
-            alert('Lỗi: ' + (data.error || 'Không thể tạo câu chuyện'));
+            alert('Lỗi: ' + (result.error || 'Không thể tạo câu chuyện'));
         }
-    } catch (err) {
-        alert('Lỗi kết nối: ' + err.message);
+    } catch (error) {
+        alert('Lỗi kết nối: ' + error.message);
     } finally {
-        btnText.textContent = 'Tạo câu chuyện';
-        spinner.classList.add('hidden');
         generateBtn.disabled = false;
+        generateBtn.textContent = 'Tạo câu chuyện';
     }
 }
+
+// Event Listeners
+storyInput.addEventListener('input', updateWordCount);
+generateBtn.addEventListener('click', generateStory);
+
+settingsBtn.addEventListener('click', openModal);
+closeSettings.addEventListener('click', closeModal);
+settingsModal.querySelector('.modal-overlay').addEventListener('click', closeModal);
+
+tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+});
+
+jsonFileInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            try {
+                currentConfig.jsonData = JSON.parse(event.target.result);
+                alert('Đã tải file JSON thành công!');
+            } catch (error) {
+                alert('File JSON không hợp lệ');
+            }
+        };
+        reader.readAsText(file);
+    }
+});
+
+testConnectionBtn.addEventListener('click', testConnection);
+saveSettingsBtn.addEventListener('click', handleSaveSettings);
+
+// Close modal on Escape key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !settingsModal.classList.contains('hidden')) {
+        closeModal();
+    }
+});
+
+// Initialize
+loadConfig();
+updateWordCount();

@@ -1,270 +1,86 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="vi">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>GLOW Story Studio</title>
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <div class="app-shell">
-      <!-- Header với Settings Button -->
-      <header class="global-header">
-        <div class="header-left">
-          <div class="brand-mark">GS</div>
-          <h1>GLOW Story Studio</h1>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Story Assistant</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="app-header">
+        <div class="logo">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+            </svg>
+            <span>StoryAI</span>
         </div>
-        <button id="settingsBtn" class="icon-btn" title="Cài đặt AI">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="3"></circle>
-            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-          </svg>
+        <button id="settingsBtn" class="icon-btn" title="Cài đặt">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
         </button>
-      </header>
+    </header>
 
-      <!-- Settings Modal -->
-      <div id="settingsModal" class="modal-overlay hidden">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h2>Cài đặt AI Backend</h2>
-            <button id="closeSettingsBtn" class="close-btn">&times;</button>
-          </div>
-          <div class="modal-body">
-            <div class="setting-group">
-              <label>Phương thức kết nối</label>
-              <div class="toggle-group">
-                <button class="toggle-btn active" data-mode="key">API Key</button>
-                <button class="toggle-btn" data-mode="json">File JSON</button>
-              </div>
+    <!-- Main Content -->
+    <main class="container">
+        <div class="card">
+            <h1>Tạo câu chuyện của bạn</h1>
+            <p class="subtitle">Nhập ý tưởng và để AI giúp bạn phát triển nó.</p>
+            
+            <textarea id="storyInput" placeholder="Ví dụ: Một chú mèo du hành vũ trụ tìm kiếm hành tinh cá ngừ..."></textarea>
+            
+            <div class="controls">
+                <div class="word-count">Số từ: <span id="wordCount">0</span></div>
+                <button id="generateBtn" class="primary-btn">Tạo câu chuyện</button>
             </div>
 
-            <!-- API Key Section -->
-            <div id="apiKeySection" class="config-section">
-              <label for="apiKeyInput">Gemini API Key / OpenAI API Key</label>
-              <input type="password" id="apiKeyInput" placeholder="Dán API Key vào đây..." />
-              <p class="help-text">Lấy API Key từ <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a> hoặc <a href="https://platform.openai.com/api-keys" target="_blank">OpenAI Platform</a></p>
+            <div id="resultArea" class="result-area hidden">
+                <h3>Kết quả:</h3>
+                <div id="outputContent"></div>
             </div>
-
-            <!-- JSON Section -->
-            <div id="jsonSection" class="config-section hidden">
-              <label for="jsonFileInput">Tải lên Service Account JSON</label>
-              <input type="file" id="jsonFileInput" accept=".json" />
-              <div id="jsonStatus" class="file-status"></div>
-              <p class="help-text">File JSON từ Google Cloud Console (Service Account)</p>
-            </div>
-
-            <div class="connection-status">
-              <span id="connectionIndicator" class="status-dot"></span>
-              <span id="connectionText">Chưa kết nối</span>
-            </div>
-
-            <button id="saveSettingsBtn" class="primary-btn">Lưu cấu hình</button>
-            <button id="testConnectionBtn" class="secondary-btn">Kiểm tra kết nối</button>
-          </div>
         </div>
-      </div>
+    </main>
 
-      <aside class="sidebar">
-        <section class="input-panel">
-          <div class="panel-heading">
-            <h2>Nguồn truyện</h2>
-            <span id="wordCount">0 từ</span>
-          </div>
-          <textarea id="storyInput" placeholder="Dán script truyện đọc, transcript audio hoặc ý tưởng truyện vào đây..."></textarea>
-          <div class="input-actions">
-            <button id="sampleBtn" type="button">Nạp mẫu</button>
-            <button id="clearBtn" type="button">Xóa</button>
-          </div>
-        </section>
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal hidden">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Cài đặt kết nối AI</h2>
+                <button id="closeSettings" class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="tab-group">
+                    <button class="tab-btn active" data-tab="apikey">API Key</button>
+                    <button class="tab-btn" data-tab="json">File JSON</button>
+                </div>
 
-        <section class="control-panel">
-          <label for="genreSelect">DNA thể loại</label>
-          <select id="genreSelect">
-            <option value="wit">WIT Daily / Healing Story</option>
-            <option value="children">Thiếu nhi / cổ tích</option>
-            <option value="fable">Ngụ ngôn / bài học mềm</option>
-            <option value="inspiration">Truyền cảm hứng</option>
-            <option value="history">Lịch sử / giáo dục</option>
-            <option value="horror">Kinh dị nhẹ</option>
-            <option value="romance">Tình cảm</option>
-          </select>
+                <!-- Tab API Key -->
+                <div id="tab-apikey" class="tab-content active">
+                    <label>Nhập Google Gemini API Key hoặc OpenAI Key:</label>
+                    <input type="password" id="apiKeyInput" placeholder="Nhập key tại đây...">
+                    <p class="help-text">Lấy key miễn phí tại <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a>.</p>
+                </div>
 
-          <label for="targetSelect">Nền tảng xuất bản</label>
-          <select id="targetSelect">
-            <option value="shorts">Shorts / Reels / TikTok</option>
-            <option value="youtube">YouTube 3-8 phút</option>
-            <option value="festival">Festival short film</option>
-            <option value="education">Giáo dục / lớp học</option>
-          </select>
+                <!-- Tab JSON -->
+                <div id="tab-json" class="tab-content">
+                    <label>Tải lên file Service Account JSON:</label>
+                    <input type="file" id="jsonFileInput" accept=".json">
+                    <p class="help-text">Dùng cho tài khoản Google Cloud trả phí.</p>
+                </div>
 
-          <label for="lengthRange">Độ dài video</label>
-          <div class="range-row">
-            <input id="lengthRange" type="range" min="1" max="10" value="4" />
-            <output id="lengthOutput">4 phút</output>
-          </div>
+                <div class="status-box" id="connectionStatus">
+                    Trạng thái: <span class="status-dot"></span> <span class="status-text">Chưa kết nối</span>
+                </div>
 
-          <button id="generateBtn" class="primary-action" type="button">Tạo bản chuyển thể cấp studio</button>
-        </section>
-      </aside>
-
-      <main class="workspace">
-        <header class="topbar">
-          <div>
-            <p class="eyebrow">Creative War Room</p>
-            <h2>Không minh họa truyện. Thiết kế lại trải nghiệm để người xem dừng lại, cảm thấy, và muốn chia sẻ.</h2>
-          </div>
-          <div class="score-strip">
-            <div><span id="hookScore">--</span><small>Hook</small></div>
-            <div><span id="emotionScore">--</span><small>Emotion</small></div>
-            <div><span id="viralScore">--</span><small>Share</small></div>
-            <div><span id="glowScore">--</span><small>GLOW</small></div>
-          </div>
-        </header>
-
-        <nav class="tabs" aria-label="Studio views">
-          <button class="tab active" data-tab="warroom">War Room</button>
-          <button class="tab" data-tab="evidence">Evidence</button>
-          <button class="tab" data-tab="agents">Agent Council</button>
-          <button class="tab" data-tab="script">Viral Script</button>
-          <button class="tab" data-tab="adaptation">Chuyển thể</button>
-          <button class="tab" data-tab="bible">Bible</button>
-          <button class="tab" data-tab="storyboard">Storyboard</button>
-          <button class="tab" data-tab="prompts">Prompts</button>
-          <button class="tab" data-tab="qa">QA</button>
-        </nav>
-
-        <section id="warroom" class="tab-panel active">
-          <div class="section-grid">
-            <article class="wide-card">
-              <h3>Story Diagnosis</h3>
-              <div id="storyCore" class="content-block empty">Dán truyện và bấm tạo để app tìm sự thật con người, mâu thuẫn, hook và lời hứa cảm xúc.</div>
-            </article>
-            <article>
-              <h3>Viral Thesis</h3>
-              <div id="viralThesis" class="content-block empty">Góc viral và lý do người xem chia sẻ sẽ xuất hiện ở đây.</div>
-            </article>
-            <article>
-              <h3>Retention Curve</h3>
-              <div id="retentionCurve" class="curve empty">Chưa có đường giữ chân.</div>
-            </article>
-            <article class="wide-card">
-              <h3>GLOW Non-Negotiables</h3>
-              <div id="glowAlignment" class="content-block empty">Sự thật, thấu cảm, chính trực, trưởng thành, tỉnh thức là bộ lọc trước mọi lựa chọn sáng tạo.</div>
-            </article>
-          </div>
-        </section>
-
-        <section id="evidence" class="tab-panel">
-          <div class="section-grid">
-            <article>
-              <h3>Character Lock</h3>
-              <div id="characterLock" class="content-block empty">Không thêm nhân vật ngoài truyện.</div>
-            </article>
-            <article>
-              <h3>Prop & Place Lock</h3>
-              <div id="worldLock" class="content-block empty">Đạo cụ, bối cảnh và sự kiện được khóa bằng bằng chứng.</div>
-            </article>
-            <article class="wide-card">
-              <h3>Evidence Ledger</h3>
-              <div id="evidenceLedger" class="evidence-list empty">Mỗi output sẽ trỏ về câu nguồn để tránh bịa.</div>
-            </article>
-            <article class="wide-card">
-              <h3>Inferences Needing Human Approval</h3>
-              <div id="approvalList" class="check-list empty">Các phần suy luận/đề xuất sáng tạo sẽ hiện ở đây.</div>
-            </article>
-          </div>
-        </section>
-
-        <section id="agents" class="tab-panel">
-          <div class="agent-intro">
-            <strong>Agent Council Kaizen</strong>
-            <p>Mỗi agent giờ có mission, nguồn cảm hứng, luật vận hành, điều kiện cần hỏi lại, output cụ thể, fail condition và metric cải thiện. Đây là cách giữ app khỏi tạo nội dung chung chung.</p>
-          </div>
-          <div id="agentCouncil" class="agent-grid"></div>
-        </section>
-
-        <section id="script" class="tab-panel">
-          <div class="section-grid">
-            <article class="wide-card">
-              <h3>Hook Lab</h3>
-              <div id="hookLab" class="content-block empty">App sẽ tạo các hook mở đầu có thể A/B test.</div>
-            </article>
-            <article class="wide-card">
-              <h3>Million-View Script Draft</h3>
-              <div id="scriptDraft" class="script-list empty">Bản script có nhịp giữ chân sẽ xuất hiện ở đây.</div>
-            </article>
-            <article class="wide-card">
-              <h3>AI Rewrite Room</h3>
-              <div id="aiRewriteRoom" class="script-list empty">Khi AI backend hoạt động, phần này sẽ chứa bản rewrite nhiều vòng từ các agent.</div>
-            </article>
-            <article>
-              <h3>Share Triggers</h3>
-              <div id="shareTriggers" class="content-block empty">Các lý do khiến người xem muốn gửi cho người khác.</div>
-            </article>
-            <article>
-              <h3>Comment Bait Tử Tế</h3>
-              <div id="commentPrompts" class="content-block empty">Câu hỏi mở để kéo bình luận mà không thao túng.</div>
-            </article>
-          </div>
-        </section>
-
-        <section id="adaptation" class="tab-panel">
-          <div class="section-grid">
-            <article class="wide-card">
-              <h3>Narration Surgery</h3>
-              <div id="narrationPlan" class="content-block empty">Từng câu sẽ được quyết định: giữ kể, rút gọn, chuyển thành hình, dialogue, reaction hoặc silence.</div>
-            </article>
-            <article>
-              <h3>Medium Translation</h3>
-              <div id="mediumMap" class="content-block empty">Bản dịch từ chữ sang tai và mắt.</div>
-            </article>
-            <article>
-              <h3>Genre Protocol</h3>
-              <div id="genrePreset" class="content-block empty">Luật chuyển thể theo thể loại.</div>
-            </article>
-          </div>
-        </section>
-
-        <section id="bible" class="tab-panel">
-          <div id="visualBible" class="bible-grid"></div>
-        </section>
-
-        <section id="storyboard" class="tab-panel">
-          <div class="timeline-toolbar">
-            <strong>Master Storyboard</strong>
-            <span id="sceneCount">0 scene</span>
-          </div>
-          <div id="storyboardList" class="storyboard-list empty">Storyboard theo beat giữ chân sẽ được tạo ở đây.</div>
-        </section>
-
-        <section id="prompts" class="tab-panel">
-          <div class="prompt-layout">
-            <article>
-              <h3>Image Prompt Pack</h3>
-              <div id="imagePrompts" class="prompt-list empty">Keyframe prompt có continuity bible.</div>
-            </article>
-            <article>
-              <h3>Motion Prompt Pack</h3>
-              <div id="motionPrompts" class="prompt-list empty">Video prompt 8 giây có motion, camera, emotion, sound.</div>
-            </article>
-          </div>
-        </section>
-
-        <section id="qa" class="tab-panel">
-          <div class="qa-layout">
-            <article>
-              <h3>Studio QA Checklist</h3>
-              <div id="continuityList" class="check-list empty">Chưa có checklist.</div>
-            </article>
-            <article>
-              <h3>Creative Doctor Notes</h3>
-              <div id="criticNotes" class="content-block empty">Chưa có ghi chú nâng cấp.</div>
-            </article>
-          </div>
-        </section>
-      </main>
+                <button id="testConnectionBtn" class="secondary-btn">Kiểm tra kết nối</button>
+                <button id="saveSettingsBtn" class="primary-btn full-width">Lưu cấu hình</button>
+            </div>
+        </div>
     </div>
 
     <script src="app.js"></script>
-  </body>
+</body>
 </html>
