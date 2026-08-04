@@ -8,15 +8,63 @@
   </head>
   <body>
     <div class="app-shell">
-      <aside class="sidebar">
-        <div class="brand">
+      <!-- Header với Settings Button -->
+      <header class="global-header">
+        <div class="header-left">
           <div class="brand-mark">GS</div>
-          <div>
-            <h1>GLOW Story Studio</h1>
-            <p>Script/audio/story thành gói phim có linh hồn, hook và retention.</p>
+          <h1>GLOW Story Studio</h1>
+        </div>
+        <button id="settingsBtn" class="icon-btn" title="Cài đặt AI">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </button>
+      </header>
+
+      <!-- Settings Modal -->
+      <div id="settingsModal" class="modal-overlay hidden">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2>Cài đặt AI Backend</h2>
+            <button id="closeSettingsBtn" class="close-btn">&times;</button>
+          </div>
+          <div class="modal-body">
+            <div class="setting-group">
+              <label>Phương thức kết nối</label>
+              <div class="toggle-group">
+                <button class="toggle-btn active" data-mode="key">API Key</button>
+                <button class="toggle-btn" data-mode="json">File JSON</button>
+              </div>
+            </div>
+
+            <!-- API Key Section -->
+            <div id="apiKeySection" class="config-section">
+              <label for="apiKeyInput">Gemini API Key / OpenAI API Key</label>
+              <input type="password" id="apiKeyInput" placeholder="Dán API Key vào đây..." />
+              <p class="help-text">Lấy API Key từ <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a> hoặc <a href="https://platform.openai.com/api-keys" target="_blank">OpenAI Platform</a></p>
+            </div>
+
+            <!-- JSON Section -->
+            <div id="jsonSection" class="config-section hidden">
+              <label for="jsonFileInput">Tải lên Service Account JSON</label>
+              <input type="file" id="jsonFileInput" accept=".json" />
+              <div id="jsonStatus" class="file-status"></div>
+              <p class="help-text">File JSON từ Google Cloud Console (Service Account)</p>
+            </div>
+
+            <div class="connection-status">
+              <span id="connectionIndicator" class="status-dot"></span>
+              <span id="connectionText">Chưa kết nối</span>
+            </div>
+
+            <button id="saveSettingsBtn" class="primary-btn">Lưu cấu hình</button>
+            <button id="testConnectionBtn" class="secondary-btn">Kiểm tra kết nối</button>
           </div>
         </div>
+      </div>
 
+      <aside class="sidebar">
         <section class="input-panel">
           <div class="panel-heading">
             <h2>Nguồn truyện</h2>
@@ -30,12 +78,6 @@
         </section>
 
         <section class="control-panel">
-          <div class="ai-mode-row">
-            <label for="aiMode">AI Studio Mode</label>
-            <input id="aiMode" type="checkbox" checked />
-          </div>
-          <div id="aiStatus" class="ai-status">Chưa kết nối AI backend. Nếu chưa chạy server, app sẽ dùng rule engine fallback.</div>
-
           <label for="genreSelect">DNA thể loại</label>
           <select id="genreSelect">
             <option value="wit">WIT Daily / Healing Story</option>
